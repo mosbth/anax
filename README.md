@@ -1,4 +1,4 @@
-Anax-MVC
+Anax
 =========
 
 [![Latest Stable Version](https://poser.pugx.org/leaphly/cart-bundle/version.png)](https://packagist.org/packages/anax/mvc)
