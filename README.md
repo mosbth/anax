@@ -5,7 +5,7 @@ A PHP-based and MVC-inspired (micro) framework / webbtemplate / boilerplate for 
 
 > Anax — high kings who exercise overlordship over other, presumably lesser, kings. ([Wikipedia on Anax](http://en.wikipedia.org/wiki/Anax_%28Greek%29))
 
-Anax is the glue, the kernel, needed to use other modules to make *thing* on the web.
+Anax is the glue, the kernel, needed to use other modules, to make *things* on the web.
 
 
 
