@@ -1,4 +1,4 @@
-Anax (mos/anax)
+Anax
 ==================================================
 
 A PHP-based and MVC-inspired (micro) framework / webbtemplate / boilerplate for websites, web applications and web services.
@@ -19,7 +19,7 @@ Anax is the project making us excel at PHP and framworks (1) to become awesome w
 History
 --------------------------------------------------
 
-Anax (mos/anax) builds upon its predecessors namely [Anax-MVC](https://github.com/mosbth/Anax-MVC), [Anax-oophp](https://github.com/mosbth/Anax-oophp) and [Anax-base](https://github.com/mosbth/Anax-base), which are all used in teaching web programming at Blekinge Institute of Technology (BTH) in Sweden. 
+Anax builds upon its predecessors namely [Anax-MVC](https://github.com/mosbth/Anax-MVC), [Anax-oophp](https://github.com/mosbth/Anax-oophp) and [Anax-base](https://github.com/mosbth/Anax-base), which are all used in teaching web programming at Blekinge Institute of Technology (BTH) in Sweden. 
 
 
 
