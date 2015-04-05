@@ -1,15 +1,15 @@
 {
-    "name": "anax/mvc",    
+    "name": "mos/anax",    
     "type": "library",
-    "description": "Webtemplate to create websites",
+    "description": "PHP framework to create websites, web applications and we services-",
     "keywords": ["boilerplate", "framework", "mvc", "micro", "education"],
     "homepage": "http://dbwebb.se",
     "license": "MIT",
     "authors": [
         {
             "name": "Mikael Roos",
-            "email": "me@mikaelroos.se",
-            "homepage": "http://mikaelroos.se",
+            "email": "mos@dbwebb.se",
+            "homepage": "http://dbwebb.se",
             "role": "Developer"
         }
     ],

@@ -3,12 +3,12 @@ Revision history
 
 
 
-History for mos/anax
+History for Anax
 -----------------------------------
 
 v2.5.x (latest)
 
-* Cleaning up from Anax-MVC and removing stuff not to be in mos/anax.
+* Cleaning up from Anax-MVC and removing stuff not to be in Anax.
 
 
 
