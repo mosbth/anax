@@ -3,6 +3,8 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mosbth/anax/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mosbth/anax/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/mosbth/anax/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/mosbth/anax/?branch=master)
 
+
+
 Anax
 ==================================================
 
@@ -12,7 +14,7 @@ A PHP-based and MVC-inspired (micro) framework / webbtemplate / boilerplate for 
 
 Anax is the glue, the kernel, needed to use other modules, to make *things* on the web.
 
-Anax is the means (1) to en end (2). For some it may be as a project making us excel at PHP and framworks (1) to become awesome web programmers (2). For other its a tool (1) to build web things (2).
+Anax is the means (1) to en end (2). For some it may be a project making oneself excel at PHP and framworks (1) to become awesome web programmers (2). For other its a tool (1) to build web things (2).
 
 
 
