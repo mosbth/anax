@@ -19,7 +19,7 @@ Anax is the means (1) to en end (2). For some it may be a project making oneself
 
 
 History
---------------------------------------------------
+------------------
 
 Anax builds upon its predecessors namely [Anax-MVC](https://github.com/mosbth/Anax-MVC), [Anax-oophp](https://github.com/mosbth/Anax-oophp) and [Anax-base](https://github.com/mosbth/Anax-base), which are all used in teaching web programming at Blekinge Institute of Technology (BTH) in Sweden. 
 
