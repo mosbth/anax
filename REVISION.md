@@ -8,6 +8,10 @@ History for Anax
 
 v2.5.x (latest)
 
+* Merged Anax MVC changes.
+    * Enhancing verbosity on exceptino messages by printing out $di
+    * Display valid routes and controllers to aid in 404 debugging.
+
 * Cleaning up from Anax-MVC and removing stuff not to be in Anax.
 
 
