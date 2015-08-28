@@ -1,7 +1,7 @@
 {
     "name": "mos/anax",    
     "type": "library",
-    "description": "PHP framework to create websites, web applications and we services-",
+    "description": "PHP framework to create websites, web applications and web services.",
     "keywords": ["boilerplate", "framework", "mvc", "micro", "education"],
     "homepage": "http://dbwebb.se",
     "license": "MIT",
@@ -13,10 +13,12 @@
             "role": "Developer"
         }
     ],
-    "require": {
-        "php": ">=5.4"
-    },
     "autoload": {
         "psr-4": { "Anax\\": "src/" }
+    },
+    "require": {
+        "php": ">=5.4",
+        "mos/cimage": "*",
+        "michelf/php-markdown": "*"        
     }
 }

@@ -1,13 +1,12 @@
 <?php
-/**
- * This is a Anax frontcontroller.
- *
- */
+// This is a Anax frontcontroller.
 
-// Get environment & autoloader.
-require __DIR__.'/config.php';
+// Define essential Anax paths, end with /
+define('ANAX_INSTALL_PATH', realpath(__DIR__ . '/../') . '/');
+define('ANAX_APP_PATH',     ANAX_INSTALL_PATH . 'app/');
 
-
+// Include autoloader.
+include ANAX_APP_PATH . 'config/autoloader.php';
 
 // Create services and inject into the app.
 $di  = new \Anax\DI\CDIFactoryDocumentation();
