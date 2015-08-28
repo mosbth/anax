@@ -16,6 +16,11 @@
     "autoload": {
         "psr-4": { "Anax\\": "src/" }
     },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "v2.9.x-dev"
+        }
+    },
     "require": {
         "php": ">=5.4",
         "mos/cimage": "*",
