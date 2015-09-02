@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="anax" default="test">
+
+    <property name="basedir" value="." override="true" />
+    <property name="source" value="${basedir}/src" />
+
+
+
+    <fileset dir="${basedir}" 
+             id="sourceWithTests">
+        <include name="src/**/*.php" />
+        <include name="src/*.php" />
+        <include name="test/**/*.php" />
+        <include name="test/*.php" />
+        <include name="autoload.php" />
+    </fileset>
+
+
+
+    <target name="prepare"
+            description="Create a build directory to output build stuff.">
+
+        <echo msg="Delete and re-create build directory." />
+        <delete dir="${basedir}/build"/>
+        <mkdir dir="${basedir}/build" />
+        <mkdir dir="${basedir}/build/logs" />
+    </target>
+
+
+
+    <target name="phpunit"
+            description="phpunit"
+            depends="prepare">
+            
+        <echo msg="phpunit" />
+        <phpunit configuration="${basedir}/phpunit.xml"
+                 pharlocation="${basedir}/vendor/bin/phpunit" />    
+    </target>
+
+
+
+    <target name="phpcs" 
+            description="Generate checkstyle.xml using PHP_CodeSniffer"
+            depends="prepare">
+    
+        <phpcodesniffer
+                standard="PSR2"
+                showSniffs="true"
+                showWarnings="true"
+                encoding="utf-8">
+
+            <fileset refid="sourceWithTests" />
+            <!--
+            <formatter type="default" usefile="false"/>
+            <formatter type="checkstyle" outfile="${basedir}/build/logs/checkstyle-codesniffer.xml"/>
+            -->
+            <!--<arg name="extensions" value=".php"/>-->
+            
+            <!--
+            <rule ref="PSR2">
+                <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
+                <exclude name="Squiz.Commenting.FileComment" />
+                <exclude name="Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace" />
+            </rule>
+        -->
+        </phpcodesniffer>
+    </target>
+
+
+
+    <target name="test"
+            description="Run tests"
+            depends="phpcs,phpunit" />
+
+
+
+</project>
