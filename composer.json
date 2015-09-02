@@ -13,6 +13,9 @@
             "role": "Developer"
         }
     ],
+    "support": {
+        "issues": "https://github.com/mosbth/anax/issues"
+    },
     "autoload": {
         "psr-4": { "Anax\\": "src/" }
     },
