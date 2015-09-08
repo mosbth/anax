@@ -17,7 +17,10 @@
         "issues": "https://github.com/mosbth/anax/issues"
     },
     "autoload": {
-        "psr-4": { "Anax\\": "src/" }
+        "psr-4": { 
+            "Anax\\": "src/",
+            "files": ["src/functions.php"]
+        }
     },
     "extra": {
         "branch-alias": {

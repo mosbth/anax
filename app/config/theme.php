@@ -12,7 +12,7 @@ return [
      * name: name of the theme is mapped to a directory right below the path.
      */
     'settings' => [
-        'path' => ANAX_INSTALL_PATH . 'theme/',
+        'path' => ANAX_INSTALL_PATH . '/theme/',
         'name' => 'anax-base',
     ],
 
@@ -59,4 +59,3 @@ return [
         'google_analytics' => null,
     ],
 ];
-
