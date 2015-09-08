@@ -3,7 +3,7 @@
 namespace Anax\MVC;
 
 /**
- * Anax base class implementing Dependency Injection / Service Locator 
+ * Anax base class implementing Dependency Injection / Service Locator
  * of the services used by the framework, using lazy loading.
  *
  */
@@ -34,14 +34,14 @@ class ErrorController
              throw new \Anax\Exception\NotFoundException("Not a valid HTTP status code.");
          }
 
-         $title = $codes[$code];
-         $this->di->response->setHeader($code);
-         $this->di->theme->setTitle($title);
-         $this->di->views->add('default/error', [
+            $title = $codes[$code];
+            $this->di->response->setHeader($code);
+            $this->di->theme->setTitle($title);
+            $this->di->views->add('default/error', [
              'title' => $title,
              'content' => $message,
              'details' => $this->di->flash->getMessage(),
-         ]);
+            ]);
      }
 
 
@@ -51,13 +51,13 @@ class ErrorController
        *
        * @return void
        */
-      public function displayValidRoutesAction()
-      {
-          $this->di->views->add('default/error-routes', [
+        public function displayValidRoutesAction()
+        {
+            $this->di->views->add('default/error-routes', [
               'route'           => $this->di->request->getRoute(),
               'routes'          => $this->di->router->getAll(),
               'internalRoutes'  => $this->di->router->getInternal(),
               'controllers'     => $this->di->getControllers(),
-          ]);
-      }
+            ]);
+        }
 }

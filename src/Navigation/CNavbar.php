@@ -16,7 +16,7 @@ class CNavbar
 
     /**
      * Create a navigation bar / menu, with submenu.
-     * 
+     *
      * @return string with html for the menu.
      *
      * @link http://dbwebb.se/coachen/skapa-en-dynamisk-navbar-meny-med-undermeny-via-php
@@ -42,7 +42,6 @@ class CNavbar
             $hasItemIsSelected = false;
 
             foreach ($items as $item) {
-
                 // has submenu, call recursivly and keep track on if the submenu has a selected item in it.
                 $submenu        = null;
                 $selectedParent = null;

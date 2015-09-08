@@ -7,26 +7,23 @@
     <file>autoload.php</file>
 
     <exclude-pattern>docs/*</exclude-pattern>
-    <exclude-pattern>coverage/*</exclude-pattern>
-    <exclude-pattern>webroot/imgs.php</exclude-pattern>
-    <exclude-pattern>webroot/imgp.php</exclude-pattern>
-    <exclude-pattern>webroot/imgd.php</exclude-pattern>
-    <exclude-pattern>webroot/test/*</exclude-pattern>
-    <exclude-pattern>webroot/js/*</exclude-pattern>
-    <exclude-pattern>webroot/compare/*</exclude-pattern>
+    <exclude-pattern>build/*</exclude-pattern>
+    <exclude-pattern>vendor/*</exclude-pattern>
 
+<!--
     <arg name="encoding" value="utf-8"/>
+    <arg name="show_warnings" value="1"/>
+    <arg name="colors" value="1"/>
+    <arg name="tab_width" value="4"/>
+    
+-->
     <!--<arg name="extensions" value=".php"/>-->
-    <!--<arg name="colors" value="1"/>-->
     <!--<arg name="warning-severity" value="5"/>-->
 
     <rule ref="PSR2">
+<!--
         <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />         <exclude name="Squiz.Commenting.FileComment" />
         <exclude name="Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace" />
-
-        <!--
-        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace" />
-        -->
+    -->
     </rule>
-    
 </ruleset>

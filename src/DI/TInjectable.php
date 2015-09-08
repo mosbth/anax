@@ -49,7 +49,6 @@ trait TInjectable
         }
 
         try {
-
             $this->$service = $this->di->get($service);
             return $this->$service;
 
@@ -85,7 +84,6 @@ trait TInjectable
         }
 
         try {
-
             $this->$service = $this->di->get($service);
             return $this->$service;
 

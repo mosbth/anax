@@ -2,6 +2,8 @@
 
 <project name="anax" default="test">
 
+    <!-- <php expression="include('vendor/autoload.php')"/> -->
+
     <property name="basedir" value="." override="true" />
     <property name="source" value="${basedir}/src" />
 
@@ -32,10 +34,27 @@
     <target name="phpunit"
             description="phpunit"
             depends="prepare">
-            
-        <echo msg="phpunit" />
-        <phpunit configuration="${basedir}/phpunit.xml"
+
+<!--
+        <phpunit configuration="${basedir}/.phpunit.xml"
                  pharlocation="${basedir}/vendor/bin/phpunit" />    
+-->
+        <phpunit 
+            configuration="phpunit.xml"
+            pharlocation="vendor/bin/phpunit"
+            bootstrap="test/config.php" />    
+    </target>
+
+
+
+    <target name="phpmd"
+            description="phpmd"
+            depends="prepare">
+            
+        <phpmd
+            rulesets="cleancode,codesize,controversial,design,naming,unusedcode">
+            <fileset refid="sourceWithTests" />
+        </phpmd>
     </target>
 
 
@@ -43,12 +62,16 @@
     <target name="phpcs" 
             description="Generate checkstyle.xml using PHP_CodeSniffer"
             depends="prepare">
-    
+
+<!--    
+            <phpcodesniffer
+                    standard=".phpcs.xml"
+                    showSniffs="true"
+                    showWarnings="true"
+                    encoding="utf-8">
+-->
         <phpcodesniffer
-                standard="PSR2"
-                showSniffs="true"
-                showWarnings="true"
-                encoding="utf-8">
+                standard=".phpcs.xml">
 
             <fileset refid="sourceWithTests" />
             <!--
@@ -71,7 +94,7 @@
 
     <target name="test"
             description="Run tests"
-            depends="phpcs,phpunit" />
+            depends="phpmd,phpcs,phpunit" />
 
 
 
