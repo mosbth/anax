@@ -5,7 +5,6 @@ namespace Anax\DI;
 /**
  * Anax base class implementing Dependency Injection / Service Locator
  * of the services used by the framework, using lazy loading.
- *
  */
 class CDIFactoryDefault extends CDI
 {
@@ -17,7 +16,7 @@ class CDIFactoryDefault extends CDI
     {
         parent::__construct();
 
-        require ANAX_APP_PATH . 'config/error_reporting.php';
+        require ANAX_APP_PATH . '/config/error_reporting.php';
 
         $this->setShared('response', '\Anax\Response\CResponseBasic');
         $this->setShared('validate', '\Anax\Validate\CValidate');
@@ -57,7 +56,7 @@ class CDIFactoryDefault extends CDI
 
         $this->setShared('views', function () {
             $views = new \Anax\View\CViewContainerBasic();
-            $views->setBasePath(ANAX_APP_PATH . 'view');
+            $views->setBasePath(ANAX_APP_PATH . '/view');
             $views->setFileSuffix('.tpl.php');
             $views->setDI($this);
             return $views;
@@ -116,7 +115,7 @@ class CDIFactoryDefault extends CDI
 
         $this->setShared('session', function () {
             $session = new \Anax\Session\CSession();
-            $session->configure(ANAX_APP_PATH . 'config/session.php');
+            $session->configure(ANAX_APP_PATH . '/config/session.php');
             $session->name();
             $session->start();
             return $session;
@@ -125,27 +124,27 @@ class CDIFactoryDefault extends CDI
         $this->setShared('theme', function () {
             $themeEngine = new \Anax\ThemeEngine\CThemeBasic();
             $themeEngine->setDI($this);
-            $themeEngine->configure(ANAX_APP_PATH . 'config/theme.php');
+            $themeEngine->configure(ANAX_APP_PATH . '/config/theme.php');
             return $themeEngine;
         });
 
         $this->setShared('navbar', function () {
             $navbar = new \Anax\Navigation\CNavbar();
             $navbar->setDI($this);
-            $navbar->configure(ANAX_APP_PATH . 'config/navbar.php');
+            $navbar->configure(ANAX_APP_PATH . '/config/navbar.php');
             return $navbar;
         });
 
         $this->set('fileContent', function () {
             $fc = new \Anax\Content\CFileContent();
-            $fc->setBasePath(ANAX_APP_PATH . 'content/');
+            $fc->setBasePath(ANAX_APP_PATH . '/content/');
             return $fc;
         });
 
         $this->setShared('textFilter', function () {
             $filter = new \Anax\Content\CTextFilter();
             $filter->setDI($this);
-            $filter->configure(ANAX_APP_PATH . 'config/text_filter.php');
+            $filter->configure(ANAX_APP_PATH . '/config/text_filter.php');
             return $filter;
         });
     }
