@@ -42,7 +42,7 @@ class CDITest extends \PHPUnit_Framework_TestCase
 
         $di->set($service, function () {
             $session = new \Anax\Session\CSession();
-            $session->configure(ANAX_APP_PATH . 'config/session.php');
+            $session->configure(ANAX_APP_PATH . '/config/session.php');
             $session->name();
             //$session->start();
             return $session;

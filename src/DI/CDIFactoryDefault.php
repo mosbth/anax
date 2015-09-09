@@ -141,10 +141,17 @@ class CDIFactoryDefault extends CDI
             return $fc;
         });
 
+        $this->set('pageContent', function () {
+            $fc = new \Anax\Content\CPageContent();
+            $fc->setBasePath(ANAX_APP_PATH . '/content/');
+            return $fc;
+        });
+
         $this->setShared('textFilter', function () {
-            $filter = new \Anax\Content\CTextFilter();
-            $filter->setDI($this);
-            $filter->configure(ANAX_APP_PATH . '/config/text_filter.php');
+            //$filter = new \Anax\Content\CTextFilter();
+            $filter = new \Mos\TextFilter\CTextFilter();
+            //$filter->setDI($this);
+            //$filter->configure(ANAX_APP_PATH . '/config/text_filter.php');
             return $filter;
         });
     }

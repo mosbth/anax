@@ -2,7 +2,7 @@
 
 <project name="anax" default="test">
 
-    <!-- <php expression="include('vendor/autoload.php')"/> -->
+    <!-- <php expression="require('vendor/autoload.php')"/> -->
 
     <property name="basedir" value="." override="true" />
     <property name="source" value="${basedir}/src" />
@@ -94,6 +94,12 @@
 
     <target name="test"
             description="Run tests"
+            depends="phpunit" />
+
+
+
+    <target name="all"
+            description="Run all tests"
             depends="phpmd,phpcs,phpunit" />
 
 
