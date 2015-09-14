@@ -3,11 +3,15 @@
 namespace Anax\Content;
 
 /**
- * A read content from filesystem.
+ * Pages based on file content.
  *
  */
-class CFileContent
+class CPageContent
 {
+    use \Anax\TConfigure,
+        \Anax\TInjectionAware;
+
+
 
     /**
      * Properties
@@ -18,41 +22,32 @@ class CFileContent
 
 
     /**
-     * Get file as content.
+     * Map url to page if such mapping can be done.
      *
-     * @param string $file with content
-     *
-     * @return string as content of the file
-     *
-     * @throws Exception when file does not exist
+     * @throws NotFoundException when mapping can not be done.
      */
-    public function get($file)
+    public function get()
     {
-        $target = $this->path . $file;
-
-        if (!is_readable($target)) {
-            throw new \Exception("No such content " . $target);
+        $route = $this->di->request->getRoute();
+        $pages = $this->config['pages'];
+        
+        if (!isset($pages[$route])) {
+            throw new \Anax\Exception\NotFoundException("The documentation page does not exists.");
         }
 
-        return file_get_contents($target);
-    }
+        $title = $pages[$route]['title'];
+        $file  = isset($pages[$route]['file'])
+            ? $pages[$route]['file']
+            : $route . ".md";
 
+        $app->theme->setTitle($title);
 
+        $content = $app->fileContent->get($file);
+        $content = $app->textFilter->doFilter($content, 'shortcode, markdown');
 
-    /**
-     * Set base path where  to find content.
-     *
-     * @param string $path where content reside
-     *
-     * @return $this
-     */
-    public function setBasePath($path)
-    {
-        if (!is_dir($path)) {
-            throw new \Exception("Base path for file content is not a directory: " . $path);
-        }
-        $this->path = rtrim($path, '/') . '/';
+        $app->views->add('default/article', [
+            'content' => $content,
+        ]);
 
-        return $this;
     }
 }

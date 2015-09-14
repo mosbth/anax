@@ -39,7 +39,6 @@ class CUrl
     public function create($uri = null)
     {
         if (empty($uri)) {
-
             // Empty uri means baseurl
             return $this->baseUrl
                 . (($this->urlType == self::URL_APPEND)
@@ -47,12 +46,10 @@ class CUrl
                     : null);
 
         } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
-
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
 
         } elseif ($uri[0] == '/') {
-
             // Absolute url, prepend with siteUrl
             return rtrim($this->siteUrl . rtrim($uri, '/'), '/');
 
@@ -79,17 +76,14 @@ class CUrl
     public function createRelative($uri = null)
     {
         if (empty($uri)) {
-
             // Empty uri means baseurl
             return $this->baseUrl;
 
         } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
-
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
 
         } elseif ($uri[0] == '/') {
-
             // Absolute url, prepend with siteUrl
             return rtrim($this->siteUrl . rtrim($uri, '/'), '/');
 
@@ -111,16 +105,13 @@ class CUrl
     public function asset($uri = null)
     {
         if (empty($uri)) {
-
             // Allow empty
 
         } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
-
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
 
         } elseif ($uri[0] == '/') {
-
             // Absolute url, prepend with staticSiteUrl
             return rtrim($this->staticSiteUrl . rtrim($uri, '/'), '/');
 

@@ -1,14 +1,18 @@
 <?php
 
+/*
 $pages = [
     ''                  => ['title' => 'Home', 'file' => 'index.md'],
     'http-error-codes'  => ['title' => 'Exceptions as HTTP error codes'],
     'create-urls'       => ['title' => 'Creating urls'],
     'create-urls-in-md' => ['title' => 'Creating urls in text or Markdown'],
 ];
+*/
 
-$app->router->add('*', function () use ($app, $pages) {
+$app->router->add('*', function () use ($app) {
 
+    $app->pageContent->get();
+/*
     $route = $app->request->getRoute();
 
     if (!isset($pages[$route])) {
@@ -28,6 +32,7 @@ $app->router->add('*', function () use ($app, $pages) {
     $app->views->add('default/article', [
         'content' => $content,
     ]);
+*/
 
 });
 

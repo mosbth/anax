@@ -17,3 +17,4 @@ interface IInjectionAware
      */
     public function setDI($di);
 }
+
