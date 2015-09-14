@@ -144,7 +144,7 @@ class CDIFactoryDefault extends CDI
         $this->set('pageContent', function () {
             $pc = new \Anax\Content\CPageContent();
             $pc->setDI($this);
-            $pc->configure(ANAX_APP_PATH . '/config/page-content.php');
+            $pc->configure(ANAX_APP_PATH . '/config/page_content.php');
             //$pc->setBasePath(ANAX_APP_PATH . '/content/');
             return $pc;
         });

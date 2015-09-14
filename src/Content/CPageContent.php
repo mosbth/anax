@@ -9,7 +9,7 @@ namespace Anax\Content;
 class CPageContent
 {
     use \Anax\TConfigure,
-        \Anax\TInjectionAware;
+        \Anax\DI\TInjectionAware;
 
 
 
@@ -32,20 +32,21 @@ class CPageContent
         $pages = $this->config['pages'];
         
         if (!isset($pages[$route])) {
-            throw new \Anax\Exception\NotFoundException("The documentation page does not exists.");
+            throw new \Anax\Exception\NotFoundException("The page does not exists.");
         }
 
-        $title = $pages[$route]['title'];
-        $file  = isset($pages[$route]['file'])
-            ? $pages[$route]['file']
-            : $route . ".md";
+        $view   = $this->config['view'];
+        $filter = $this->config['textfilter'];
+        $page   = $pages[$route];
+        $title  = $page['title'];
+        $file   = $page['file'];
+        
+        $this->di->theme->setTitle($title);
+        
+        $content = $this->di->fileContent->get($file);
+        $content = $this->di->textFilter->doFilter($content, $filter);
 
-        $app->theme->setTitle($title);
-
-        $content = $app->fileContent->get($file);
-        $content = $app->textFilter->doFilter($content, 'shortcode, markdown');
-
-        $app->views->add('default/article', [
+        $this->di->views->add($view, [
             'content' => $content,
         ]);
 

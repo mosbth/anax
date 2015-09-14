@@ -124,7 +124,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
     public function render()
     {
         // Prepare details
-        $path       = $this->config['settings']['path'];
+        $path       = $this->config['settings']['path'] . '/';
         $name       = $this->config['settings']['name'] . '/';
         $template   = 'index.tpl.php';
         $functions  = 'functions.php';
