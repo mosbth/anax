@@ -1,6 +1,6 @@
 <?php
 /**
- * Config-file for text filters.
+ * Config-file for page content.
  *
  */
 return [
@@ -13,6 +13,10 @@ return [
 
     // Default view
     'view' => 'default/article',
+
+    // Filter to load content
+    'glob' => '*.md',
+
 
     // Define url to page details.
     'pages' => [

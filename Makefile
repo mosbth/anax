@@ -13,6 +13,7 @@ COMPOSER_PACKAGES = 					\
 NPM_PACKAGES = 							\
 	htmlhint							\
 	csslint								\
+	less								\
 
 APM_PACKAGES = 							\
 	linter 								\
@@ -29,6 +30,16 @@ APM_PACKAGES = 							\
 	linter-shellcheck 					\
 	linter-xmllint						\
 	block-travel 						\
+
+
+
+#
+# less
+#
+.PHONY: less
+
+less:
+	lessc --clean-css app/css/style.less htdocs/css/style.css
 
 
 

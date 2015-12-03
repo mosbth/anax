@@ -1,14 +1,5 @@
 <?php
 
-/*
-$pages = [
-    ''                  => ['title' => 'Home', 'file' => 'index.md'],
-    'http-error-codes'  => ['title' => 'Exceptions as HTTP error codes'],
-    'create-urls'       => ['title' => 'Creating urls'],
-    'create-urls-in-md' => ['title' => 'Creating urls in text or Markdown'],
-];
-*/
-
 $app->router->add('*', function () use ($app) {
 
     $app->pageContent->get();
@@ -35,10 +26,3 @@ $app->router->add('*', function () use ($app) {
 */
 
 });
-
-/*
-// Default route
-$app->router->add('*', function () use ($app) {
-    ;
-}
-*/

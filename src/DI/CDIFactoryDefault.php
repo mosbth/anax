@@ -37,6 +37,12 @@ class CDIFactoryDefault extends CDI
             return $log;
         });
 
+        $this->setShared('cache', function () {
+            $cache = new \Anax\Cache\CFileCache();
+            $cache->configure(ANAX_APP_PATH . '/config/cache.php');
+            return $cache;
+        });
+
         $this->setShared('request', function () {
             $request = new \Anax\Request\CRequestBasic();
             $request->init();

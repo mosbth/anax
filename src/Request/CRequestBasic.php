@@ -8,8 +8,6 @@ namespace Anax\Request;
  */
 class CRequestBasic
 {
-
-
     /**
     * Properties
     *
@@ -78,9 +76,10 @@ class CRequestBasic
         // Prepare to create siteUrl and baseUrl by using currentUrl
         $this->currentUrl = $this->getCurrentUrl();
         $parts = parse_url($this->currentUrl);
-        $this->siteUrl = "{$parts['scheme']}://{$parts['host']}" . (isset($parts['port'])
-            ? ":{$parts['port']}"
-            : '');
+        $this->siteUrl = "{$parts['scheme']}://{$parts['host']}"
+            . (isset($parts['port'])
+                ? ":{$parts['port']}"
+                : '');
         $this->baseUrl = $this->siteUrl . $this->path;
 
         return $this;
@@ -191,7 +190,7 @@ class CRequestBasic
 
         $this->route = $route;
         $this->routeParts = explode('/', trim($route, '/'));
-//var_dump($route);
+
         return $this->route;
     }
 
@@ -222,7 +221,6 @@ class CRequestBasic
         } else {
             $ru = rtrim(strtok($this->getServer('REQUEST_URI'), '?'), '/');
         }
-
 
         $url  = $rs ? $rs : 'http';
         $url .= $https ? 's' : '';

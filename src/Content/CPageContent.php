@@ -14,10 +14,9 @@ class CPageContent
 
 
     /**
-     * Properties
-     *
+     * Properties.
      */
-    private $path;
+    private $toc = null;
 
 
 
@@ -26,29 +25,108 @@ class CPageContent
      *
      * @throws NotFoundException when mapping can not be done.
      */
-    public function get()
+    public function getContentForRoute()
     {
         $route = $this->di->request->getRoute();
-        $pages = $this->config['pages'];
-        
-        if (!isset($pages[$route])) {
-            throw new \Anax\Exception\NotFoundException("The page does not exists.");
+        $toc   = $this->getTableOfContent();
+
+        if (!key_exists($route, $toc)) {
+            throw new \Anax\Exception\NotFoundException(t('The page does not exists.'));
         }
 
-        $view   = $this->config['view'];
+        $baseroute  = dirname($route);
+    
         $filter = $this->config['textfilter'];
-        $page   = $pages[$route];
-        $title  = $page['title'];
-        $file   = $page['file'];
-        
-        $this->di->theme->setTitle($title);
-        
-        $content = $this->di->fileContent->get($file);
+        $title  = $toc[$route]['title'];
+        $file   = $toc[$route]['filename'];
+
+        $content = $this->di->fileContent->get($baseroute . '/' . $file);
         $content = $this->di->textFilter->doFilter($content, $filter);
+        
+        return [$title, $content, $toc];
+    }
 
-        $this->di->views->add($view, [
-            'content' => $content,
-        ]);
 
+
+    /**
+     * Extract title from content.
+     *
+     * @param string $file filenam to load load content from.
+     *
+     * @return string as the title for the content.
+     */
+    public function getTitleFromFirstLine($file)
+    {
+        $content = file_get_contents($file, false, null, -1, 512);
+        $title = strstr($content, "\n", true);
+        
+        return $title;
+    }
+
+
+
+    /**
+     * Get table of content for all pages.
+     *
+     * @return array as table of content.
+     */
+    public function getTableOfContent()
+    {
+        if ($this->toc) {
+            return $this->toc;
+        }
+
+        $key = $this->di->cache->createKey(__CLASS__, 'toc');
+        $this->toc = $this->di->cache->get($key);
+
+        if (!$this->toc) {
+            $this->toc = $this->createTableOfContent();
+            $this->di->cache->put($key, $this->toc);
+        }
+
+        return $this->toc;
+    }
+
+
+
+    /**
+     * Generate ToC from directory structure, containing url, title and filename
+     * of each page.
+     *
+     * @return array as table of content.
+     */
+    public function createTableOfContent()
+    {
+        $basepath   = $this->config['basepath'];
+        $pattern    = $this->config['pattern'];
+        $route      = $this->di->request->getRoute();
+        
+        // if dir, add index if file exists.
+        // partly for adding doc/index to work
+        // partly to make doc/ generate proper toc.
+        $baseroute  = dirname($route);
+        $path       = $basepath . '/' . $baseroute . '/' . $pattern;
+
+        $toc = [];
+        foreach (glob($path) as $file) {
+            $parts    = pathinfo($file);
+            $filename = $parts['filename'];
+
+            $title = $this->getTitleFromFirstLine($file);
+            $file2route = substr($filename, strpos($filename, '_') + 1);
+
+            $url = $baseroute . '/' . $file2route;
+            /*
+            if ($file2route == 'index' ) {
+                $url = $baseroute;
+            }*/
+
+            $toc[$url] = [
+                'title'     => $title,
+                'filename'  => $parts['basename'] , 
+            ];
+        }
+
+        return $toc;
     }
 }
