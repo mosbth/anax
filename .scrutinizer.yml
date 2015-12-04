@@ -8,7 +8,7 @@ build:
     tests:
         override:
             -
-                command: 'phpunit'
+                command: 'make phpunit'
                 coverage:
                     file: 'coverage.clover'
                     format: 'php-clover'
