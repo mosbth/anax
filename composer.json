@@ -24,11 +24,6 @@
             "src/functions.php"
         ]
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "v2.5.x-dev"
-        }
-    },
     "require": {
         "php": ">=5.4",
         "mos/cimage": "@dev",

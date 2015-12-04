@@ -45,6 +45,15 @@ APM_PACKAGES = 							\
 
 
 #
+# Various test to pass build
+#
+.PHONY: test
+
+test: phpunit phpcs
+
+
+
+#
 # less
 #
 .PHONY: less
