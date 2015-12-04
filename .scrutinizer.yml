@@ -4,6 +4,11 @@ imports:
 filter:
     excluded_paths: [vendor/*, test/*]
 
-tools:
-    external_code_coverage:
-        timeout: 600 # Timeout in seconds.
+build:
+    tests:
+        override:
+            -
+                command: 'phpunit'
+                coverage:
+                    file: 'coverage.clover'
+                    format: 'php-clover'
