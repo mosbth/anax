@@ -10,7 +10,7 @@
  * i18n, internationalization, send all strings though this function to enable i18n. Inspired by Drupal´s t()-function.
  *
  * @param string $str  the string to check up for translation.
- * @param array  $args associative array with arguments to be 
+ * @param array  $args associative array with arguments to be
  *                     replaced in the str.
  *                      - !variable: Inserted as is. Use this for text
  *                        that has already been sanitized.
@@ -32,11 +32,12 @@ function t($str, $args = [])
         foreach ($args as $key => $val) {
             switch ($key[0]) {
                 case '@':
-                    $args[$key] = htmlentities($val); 
-                break;
+                    $args[$key] = htmlentities($val);
+                    break;
 
-                case '!': 
-                default: /* pass through */ break;
+                case '!':
+                default: /* pass through */
+                    break;
             }
         }
         return strtr($str, $args);

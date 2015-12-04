@@ -207,7 +207,11 @@ class CDI implements IDI
             try {
                 $this->active[$service] = $sol();
             } catch (\Exception $e) {
-                throw new \Exception("CDI could not load service '$service'. Failed in the callback that instantiates the service. " . $e->getMessage());
+                throw new \Exception(
+                    "CDI could not load service '$service'."
+                    . "Failed in the callback that instantiates the service. "
+                    . $e->getMessage()
+                );
             }
 
         } elseif (is_object($sol)) {

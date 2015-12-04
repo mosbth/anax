@@ -55,7 +55,7 @@ class CLogger
         switch ($context) {
             case 'production':
                 break;
-            
+
             case 'development':
                 error_reporting(-1);              // Report all type of errors
                 ini_set('display_errors', 1);     // Display all errors
@@ -67,12 +67,12 @@ class CLogger
                         $exception->getTraceAsString() . "</pre>";
                 });
                 break;
-            
+
             case 'debug':
                 break;
-            
+
             default:
-                throw new Exception('Unknown context.');
+                throw new \Exception('Unknown context.');
                 break;
         }
 
@@ -90,9 +90,11 @@ class CLogger
      * @param array $context
      * @return null
      */
-    public function log($level, $message, array $context = array())
+    public function log($level, $message, array $context = [])
     {
-        echo "Level: " . $level . "<br>" . "Message: " . $message . "<br>" . htmlentities(print_r($context, 1)) . "<br>";
+        echo "Level: " . $level . "<br>"
+            . "Message: " . $message . "<br>"
+            . htmlentities(print_r($context, 1)) . "<br>";
     }
 
 

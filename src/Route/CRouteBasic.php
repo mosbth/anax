@@ -57,15 +57,15 @@ class CRouteBasic
             $rp = $ruleParts[$i];
             $qp = isset($queryParts[$i]) ? $queryParts[$i] : null;
             
-            $first = isset($rp[0]) ? $rp[0] : '';  
+            $first = isset($rp[0]) ? $rp[0] : '';
             switch ($first) {
                 case '*':
                     $match = true;
-                break;
+                    break;
                 
                 default:
                     $match = ($rp == $qp);
-                break;
+                    break;
             }
             
             if (!$match) {

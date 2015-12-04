@@ -46,7 +46,7 @@ class CFileCache
      * Get an item from the cache if available.
      *
      * @param string  $key to the cached object.
-     * @param boolean $age check the age or not, defaults to 
+     * @param boolean $age check the age or not, defaults to
      *                     false.
      *
      * @return mixed the cached object or false if it has aged
@@ -101,7 +101,7 @@ class CFileCache
 
 
     /**
-     * Prune a item from cache. 
+     * Prune a item from cache.
      *
      * @param string $key to the cached object.
      *

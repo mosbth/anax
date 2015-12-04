@@ -21,7 +21,7 @@ return [
     // Define url to page details.
     'pages' => [
         ''          => [
-            'title' => 'Home', 
+            'title' => 'Home',
             'file'  => 'index.md',
         ],
         'testpage'  => [

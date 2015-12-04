@@ -55,6 +55,25 @@ less:
 
 
 #
+# phpcs
+#
+.PHONY: phpcs
+
+phpcs:
+	phpcs --standard=.phpcs.xml 
+
+
+
+#
+# phpcbf
+#
+.PHONY: phpcbf
+
+phpcbf:
+	phpcbf --standard=.phpcs.xml
+
+
+#
 # phpunit
 #
 .PHONY: phpunit

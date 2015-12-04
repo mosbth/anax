@@ -84,6 +84,7 @@ script:
 
     # Run validation & publish
     - make phpunit
+    - make phpcs
 
 
 

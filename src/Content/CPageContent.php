@@ -4,7 +4,6 @@ namespace Anax\Content;
 
 /**
  * Pages based on file content.
- *
  */
 class CPageContent
 {
@@ -123,7 +122,7 @@ class CPageContent
 
             $toc[$url] = [
                 'title'     => $title,
-                'filename'  => $parts['basename'] , 
+                'filename'  => $parts['basename'] ,
             ];
         }
 
