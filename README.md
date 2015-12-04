@@ -8,6 +8,8 @@
 Anax
 ==================================================
 
+[![Join the chat at https://gitter.im/mosbth/anax](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mosbth/anax?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 A PHP-based and MVC-inspired (micro) framework / webbtemplate / boilerplate for websites, web applications and web services.
 
 > Anax — high kings who exercise overlordship over other, presumably lesser, kings. ([Wikipedia on Anax](http://en.wikipedia.org/wiki/Anax_%28Greek%29))
