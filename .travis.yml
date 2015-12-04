@@ -53,6 +53,9 @@ before_script:
     # Create a build directory for output
     - mkdir build
 
+    # Download parts from composer
+    - composer update
+
 
 
 script:
