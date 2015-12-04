@@ -1,5 +1,16 @@
 #!/usr/bin/make -f
 #
+#
+
+#
+# Update codebase
+#
+.PHONY: codebase-update
+codebase-update:
+	git pull
+	composer update
+
+
 # Build and development environment using make
 #
 COMPOSER_PACKAGES = 					\
