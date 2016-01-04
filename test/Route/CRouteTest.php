@@ -40,6 +40,7 @@ class CRouteTest extends \PHPUnit_Framework_TestCase
         $route->set('doc/*', null);
         $this->assertFalse($route->match('docs'));
         $this->assertTrue($route->match('doc'));
+        $this->assertTrue($route->match('doc/'));
         $this->assertTrue($route->match('doc/index'));
         $this->assertTrue($route->match('doc/index/index'));
 

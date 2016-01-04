@@ -27,22 +27,41 @@ class CPageContent
     public function getContentForRoute()
     {
         $route = $this->di->request->getRoute();
-        $toc   = $this->getTableOfContent();
+        $parts = $this->di->request->getRouteParts();
+        $toc   = $this->getTableOfContent($parts[0]);
 
-        if (!key_exists($route, $toc)) {
-            throw new \Anax\Exception\NotFoundException(t('The page does not exists.'));
-        }
-
+        $route = $this->mapRoute2Toc($route, $toc);
         $baseroute  = dirname($route);
-    
+
         $filter = $this->config['textfilter'];
         $title  = $toc[$route]['title'];
         $file   = $toc[$route]['filename'];
 
         $content = $this->di->fileContent->get($baseroute . '/' . $file);
         $content = $this->di->textFilter->doFilter($content, $filter);
-        
+
         return [$title, $content, $toc];
+    }
+
+
+
+    /**
+     * Map the route to the correct entry in the toc.
+     *
+     * @param string $route current route used to access page.
+     * @param array  $toc   the toc as array.
+     *
+     * @return string as the title for the content.
+     */
+    public function mapRoute2Toc($route, $toc)
+    {
+        if (key_exists($route, $toc)) {
+            return $route;
+        } elseif (key_exists($route . "/index", $toc)) {
+            return $route . "/index";
+        }
+
+        throw new \Anax\Exception\NotFoundException(t('The page does not exists.'));
     }
 
 
@@ -58,7 +77,7 @@ class CPageContent
     {
         $content = file_get_contents($file, false, null, -1, 512);
         $title = strstr($content, "\n", true);
-        
+
         return $title;
     }
 
@@ -67,15 +86,17 @@ class CPageContent
     /**
      * Get table of content for all pages.
      *
+     * @param string $id to use to generate key for toc.
+     *
      * @return array as table of content.
      */
-    public function getTableOfContent()
+    public function getTableOfContent($id)
     {
         if ($this->toc) {
             return $this->toc;
         }
 
-        $key = $this->di->cache->createKey(__CLASS__, 'toc');
+        $key = $this->di->cache->createKey(__CLASS__, 'toc-' . $id);
         $this->toc = $this->di->cache->get($key);
 
         if (!$this->toc) {
@@ -99,7 +120,7 @@ class CPageContent
         $basepath   = $this->config['basepath'];
         $pattern    = $this->config['pattern'];
         $route      = $this->di->request->getRoute();
-        
+
         // if dir, add index if file exists.
         // partly for adding doc/index to work
         // partly to make doc/ generate proper toc.

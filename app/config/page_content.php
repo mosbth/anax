@@ -15,18 +15,6 @@ return [
     'view' => 'default/article',
 
     // Filter to load content
-    'glob' => '*.md',
+    'pattern' => '*_*.md',
 
-
-    // Define url to page details.
-    'pages' => [
-        ''          => [
-            'title' => 'Home',
-            'file'  => 'index.md',
-        ],
-        'testpage'  => [
-            'title' => 'TestPage',
-            'file'  => 'testpage.md',
-        ],
-    ],
 ];

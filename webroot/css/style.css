@@ -2,6 +2,7 @@
  * General elements
  */
 
+@import url(navbar.css);
 @import url(figure.css);
 
 body {

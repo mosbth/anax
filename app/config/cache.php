@@ -6,7 +6,7 @@
 return [
 
     // Use for styling the menu
-    'basePath' => ANAX_APP_PATH . '/content',
+    'basepath' => ANAX_APP_PATH . '/cache',
 
     // Default age until item expires
     'age' => 7 * 24 * 60 * 60,

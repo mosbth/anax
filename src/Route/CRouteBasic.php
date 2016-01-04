@@ -50,7 +50,7 @@ class CRouteBasic
         $queryParts = explode('/', $query);
 
         $ruleCount = count($ruleParts);
-        $querCount = count($queryParts);
+        //$querCount = count($queryParts);
         
         $match = false;
         for ($i = 0; $i < $ruleCount; $i++) {
