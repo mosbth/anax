@@ -25,9 +25,9 @@ return [
         [
             'region' => 'navbar',
             'template' => [
-                'callback' => function() {              
-                    return $this->di->navbar->create(); 
-                },                                      
+                'callback' => function () {
+                    return $this->di->navbar->create();
+                },
             ],
             'data' => [],
             'sort' => -1
