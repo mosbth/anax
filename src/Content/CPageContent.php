@@ -31,13 +31,16 @@ class CPageContent
         $toc   = $this->getTableOfContent($parts[0]);
 
         $route = $this->mapRoute2Toc($route, $toc);
-        $baseroute  = dirname($route);
+        $baseroute = dirname($route);
 
         $filter = $this->config['textfilter'];
         $title  = $toc[$route]['title'];
         $file   = $toc[$route]['filename'];
 
-        $content = $this->di->fileContent->get($baseroute . '/' . $file);
+        //$content = $this->di->fileContent->get($baseroute . '/' . $file);
+        $basepath = $this->config['basepath'];
+        $target = "$basepath/$baseroute/$file";
+        $content = file_get_contents($target);
         $content = $this->di->textFilter->doFilter($content, $filter);
 
         return [$title, $content, $toc];

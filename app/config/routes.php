@@ -4,12 +4,23 @@ $app->router->add("", function () use ($app) {
 
     $app->theme->setTitle("Home");
 
-    $navbar = $app->navbar->create();
-    $app->views->addString($navbar, "navbar");
-
     $app->views->add("default/page", [
         "title"     => "The title",
         "content"   => "This is the content.",
+    ]);
+
+});
+
+
+
+$app->router->add("about", function () use ($app) {
+
+    $app->theme->setTitle("About");
+
+    $content = $app->fileContent->get("about");
+
+    $app->views->add("default/article", [
+        "content" => $content
     ]);
 
 });

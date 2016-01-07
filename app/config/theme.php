@@ -22,6 +22,16 @@ return [
      */
     'views' => [
         ['region' => 'header', 'template' => 'welcome/header', 'data' => [], 'sort' => -1],
+        [
+            'region' => 'navbar',
+            'template' => [
+                'callback' => function() {              
+                    return $this->di->navbar->create(); 
+                },                                      
+            ],
+            'data' => [],
+            'sort' => -1
+        ],
         ['region' => 'footer', 'template' => 'welcome/footer', 'data' => [], 'sort' => -1],
     ],
 

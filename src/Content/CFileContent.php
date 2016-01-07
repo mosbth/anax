@@ -8,9 +8,13 @@ namespace Anax\Content;
  */
 class CFileContent
 {
+    use \Anax\TConfigure,
+        \Anax\DI\TInjectionAware;
+
+
 
     /**
-     * Properties
+     * Base path to content.
      *
      */
     private $path;
@@ -28,13 +32,19 @@ class CFileContent
      */
     public function get($file)
     {
-        $target = $this->path . $file;
+        $basepath = $this->config['basepath'];
+        $suffix = $this->config['suffix'];
+        $target = "$basepath/$file{$suffix}";
 
         if (!is_readable($target)) {
-            throw new \Exception("No such content " . $target);
+            throw new \Exception(t("No such file content: @FILENAME", ["@FILENAME" => $target]));
         }
 
-        return file_get_contents($target);
+        $filter  = $this->config['textfilter'];
+        $content = file_get_contents($target);
+        $content = $this->di->textFilter->doFilter($content, $filter);
+
+        return $content;
     }
 
 
@@ -49,9 +59,25 @@ class CFileContent
     public function setBasePath($path)
     {
         if (!is_dir($path)) {
-            throw new \Exception("Base path for file content is not a directory: " . $path);
+            throw new \Exception(t("Base path for file content is not a directory"));
         }
         $this->path = rtrim($path, '/') . '/';
+
+        return $this;
+    }
+
+
+
+    /**
+     * Set standard suffix.
+     *
+     * @param string $suffix to use as standard suffix of filename
+     *
+     * @return $this
+     */
+    public function setSuffix($suffix)
+    {
+        $this->config['suffix'] = $suffix;
 
         return $this;
     }
