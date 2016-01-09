@@ -145,7 +145,7 @@ class CPageContent
             }*/
 
             // Create level depending on the file id
-            $id = substr($filename, 0, strpos($filename, '_') - 1);
+            $id = substr($filename, 0, strpos($filename, '_'));
             $level = 2;
             if ($id % 100 === 0) {
                 $level = 0;
