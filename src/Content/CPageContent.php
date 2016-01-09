@@ -144,9 +144,19 @@ class CPageContent
                 $url = $baseroute;
             }*/
 
+            // Create level depending on the file id
+            $id = substr($filename, 0, strpos($filename, '_') - 1);
+            $level = 2;
+            if ($id % 100 === 0) {
+                $level = 0;
+            } else if ($id % 10 === 0)  {
+                $level = 1;
+            }
+
             $toc[$url] = [
                 'title'     => $title,
-                'filename'  => $parts['basename'] ,
+                'filename'  => $parts['basename'],
+                'level'     => $level,
             ];
         }
 
