@@ -149,7 +149,7 @@ class CPageContent
             $level = 2;
             if ($id % 100 === 0) {
                 $level = 0;
-            } else if ($id % 10 === 0)  {
+            } elseif ($id % 10 === 0) {
                 $level = 1;
             }
 
