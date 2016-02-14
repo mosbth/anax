@@ -145,7 +145,6 @@ class CDIFactoryDefault extends CDI
             $fc = new \Anax\Content\CFileContent();
             $fc->setDI($this);
             $fc->configure(ANAX_APP_PATH . "/config/file_content.php");
-            //$fc->setBasePath(ANAX_APP_PATH . "/content/");
             return $fc;
         });
 
@@ -153,8 +152,14 @@ class CDIFactoryDefault extends CDI
             $pc = new \Anax\Content\CPageContent();
             $pc->setDI($this);
             $pc->configure(ANAX_APP_PATH . "/config/page_content.php");
-            //$pc->setBasePath(ANAX_APP_PATH . "/content/");
             return $pc;
+        });
+
+        $this->set("content", function () {
+            $content = new \Anax\Content\CFileBasedContent();
+            $content->setDI($this);
+            $content->configure(ANAX_APP_PATH . "/config/content.php");
+            return $content;
         });
 
         $this->setShared("textFilter", function () {

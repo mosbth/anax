@@ -22,7 +22,7 @@
 function t($str, $args = [])
 {
     /*
-    if (CLydia::Instance()->config['i18n']) {  
+    if (CLydia::Instance()->config["i18n"]) {  
         $str = gettext($str);
     }
     */
@@ -31,11 +31,11 @@ function t($str, $args = [])
     if (!empty($args)) {
         foreach ($args as $key => $val) {
             switch ($key[0]) {
-                case '@':
+                case "@":
                     $args[$key] = htmlentities($val);
                     break;
 
-                case '!':
+                case "!":
                 default: /* pass through */
                     break;
             }
@@ -93,4 +93,25 @@ function mergesort(&$array, $cmp_function)
         $array[] = $array2[$ptr2++];
     }
     return;
+}
+
+
+
+/**
+ * Glob recursivly.
+ * http://in.php.net/manual/en/function.glob.php#106595
+ *
+ * @param string $pattern  pattern to search for
+ * @param int    $flags    flags to use, as in glob()
+ *
+ * @return void
+ *
+ */
+function glob_recursive($pattern, $flags = 0)
+{
+    $files = glob($pattern, $flags);
+    foreach (glob(dirname($pattern) . "/*", GLOB_ONLYDIR|GLOB_NOSORT) as $dir) {
+        $files = array_merge($files, glob_recursive($dir .  "/" . basename($pattern), $flags));
+    }
+    return $files;
 }

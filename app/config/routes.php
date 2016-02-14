@@ -1,5 +1,6 @@
 <?php
 
+/*
 $app->router->add("", function () use ($app) {
 
     $app->theme->setTitle("Home");
@@ -25,8 +26,8 @@ $app->router->add("about", function () use ($app) {
 
 });
 
-
-
+*/
+/*
 $app->router->add("doc/*", function () use ($app) {
 
     list($title, $content, $toc) = $app->pageContent->getContentForRoute();
@@ -66,8 +67,18 @@ $app->router->add("guide/*", function () use ($app) {
 });
 
 
-
+*/
 $app->router->add("*", function () use ($app) {
+
+    $app->content->useCache(false);
+    $content = $app->content->contentForRoute();
+
+    //var_dump($content);
+    //var_dump($app->content->getIndex());
+
+    $app->views->add("default/article", [
+        "content" => $content->text,
+    ]);
 
 //    $app->pageContent->get();
 /*
