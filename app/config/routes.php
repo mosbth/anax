@@ -79,6 +79,8 @@ $app->router->add("*", function () use ($app) {
     $app->views->add("default/article", [
         "content" => $content->text,
     ]);
+    
+    $app->theme->addFrontmatter($content->frontmatter);
 
 //    $app->pageContent->get();
 /*

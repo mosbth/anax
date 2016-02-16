@@ -1,6 +1,5 @@
 ---
-meta:
-    title:    Index page title 
+title: Index page title 
 ---
 Index page
 =================================

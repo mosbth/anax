@@ -14,10 +14,9 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
 
 
     /**
-     * Properties
-     *
+     * Array with variables to provide to theme template files.
      */
-    protected $data = []; // Array with variables to provide to template files.
+    protected $data = [];
 
 
 
@@ -30,7 +29,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
      */
     public function setTitle($value)
     {
-        return $this->setVariable('title', $value);
+        return $this->setVariable("title", $value);
     }
 
 
@@ -44,7 +43,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
      */
     public function setBaseTitle($value)
     {
-        return $this->setVariable('title_append', $value);
+        return $this->setVariable("title_append", $value);
     }
 
 
@@ -66,6 +65,21 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
 
 
     /**
+     * Add frontmatter to be exposed to theme template file.
+     *
+     * @param array|null $matter to add.
+     *
+     * @return $this
+     */
+    public function addFrontmatter($matter)
+    {
+        $this->data = array_merge_recursive($this->data, $matter);
+        return $this;
+    }
+
+
+
+    /**
      * Get a value of a variable which will be exposed to the template files
      * during render.
      *
@@ -77,8 +91,8 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
     {
         if (isset($this->data[$which])) {
             return $this->data[$which];
-        } elseif (isset($this->config['data'])) {
-            return $this->config['data'][$which];
+        } elseif (isset($this->config["data"])) {
+            return $this->config["data"][$which];
         }
 
         return null;
@@ -95,7 +109,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
      */
     public function addStylesheet($uri)
     {
-        $this->config['data']['stylesheets'][] = $uri;
+        $this->config["data"]["stylesheets"][] = $uri;
         return $this;
     }
 
@@ -110,7 +124,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
      */
     public function addJavaScript($uri)
     {
-        $this->config['data']['javascript_include'][] = $uri;
+        $this->config["data"]["javascript_include"][] = $uri;
         return $this;
     }
 
@@ -124,10 +138,10 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
     public function render()
     {
         // Prepare details
-        $path       = $this->config['settings']['path'] . '/';
-        $name       = $this->config['settings']['name'] . '/';
-        $template   = 'index.tpl.php';
-        $functions  = 'functions.php';
+        $path       = $this->config["settings"]["path"] . "/";
+        $name       = $this->config["settings"]["name"] . "/";
+        $template   = "index.tpl.php";
+        $functions  = "functions.php";
 
         // Include theme specific functions file
         $file = $path . $name . $functions;
@@ -136,9 +150,9 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
         }
 
         // Create views for regions, from config-file
-        if (isset($this->config['views'])) {
-            foreach ($this->config['views'] as $view) {
-                $this->di->views->add($view['template'], $view['data'], $view['region'], $view['sort']);
+        if (isset($this->config["views"])) {
+            foreach ($this->config["views"] as $view) {
+                $this->di->views->add($view["template"], $view["data"], $view["region"], $view["sort"]);
             }
         }
 
@@ -147,8 +161,8 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
 
         // Create a view to execute the default template file
         $tpl  = $path . $name . $template;
-        $data = array_merge($this->config['data'], $this->data);
-        $view = $this->di->get('view');
+        $data = array_merge($this->config["data"], $this->data);
+        $view = $this->di->get("view");
         $view->set($tpl, $data);
         $view->setDI($this->di);
         $view->render();
