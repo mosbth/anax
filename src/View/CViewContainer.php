@@ -6,9 +6,10 @@ namespace Anax\View;
  * A view container, store all views per region, render at will.
  *
  */
-class CViewContainerBasic implements \Anax\DI\IInjectionAware
+class CViewContainer implements \Anax\DI\IInjectionAware
 {
-    use \Anax\DI\TInjectionAware;
+    use \Anax\TConfigure,
+        \Anax\DI\TInjectionAware;
 
 
 
@@ -17,8 +18,32 @@ class CViewContainerBasic implements \Anax\DI\IInjectionAware
      *
      */
     private $views = []; // Array for all views
-    private $suffix;     // Template file suffix
-    private $path;       // Base path for views
+
+
+
+    /**
+     * Convert template to path to template file.
+     *
+     * @param string $template the name of the template file to include
+     *
+     * @throws Anax\View\Exception when template file is missing
+     *
+     * @return string as path to the template file
+     */
+    public function getTemplateFile($template)
+    {
+        $paths  = $this->config["path"];
+        $suffix = $this->config["suffix"];
+
+        foreach ($paths as $path) {
+            $file = $path . "/" . $template . $suffix;
+            if (is_file($file)) {
+                return $file;
+            }
+        }
+
+        throw new Exception("Could not find template file '$template'.");
+    }
 
 
 
@@ -32,16 +57,19 @@ class CViewContainerBasic implements \Anax\DI\IInjectionAware
      *
      * @return $this
      */
-    public function add($template, $data = [], $region = 'main', $sort = 0)
+    public function add($template, $data = [], $region = "main", $sort = 0)
     {
-        $view = $this->di->get('view');
+        $view = $this->di->get("view");
 
         if (is_string($template)) {
-            $tpl = $this->path . $template . $this->suffix;
-            $type = 'file';
+            $tpl = $this->getTemplateFile($template);
+            $type = "file";
         } elseif (is_array($template)) {
             $tpl = $template;
-            $type = 'callback';
+
+            if (isset($tpl["template"])) {
+                $tpl["template"] = $this->getTemplateFile($tpl["template"]);
+            }
         }
 
         $view->set($tpl, $data, $sort, $type);
@@ -63,11 +91,10 @@ class CViewContainerBasic implements \Anax\DI\IInjectionAware
      *
      * @return $this
      */
-    public function addCallback($callback, $data = [], $region = 'main', $sort = 0)
+    public function addCallback($callback, $data = [], $region = "main", $sort = 0)
     {
-        $view = $this->di->get('view');
-
-        $view->set(['callback' => $callback], $data, $sort, 'callback');
+        $view = $this->di->get("view");
+        $view->set(["callback" => $callback], $data, $sort, "callback");
         $view->setDI($this->di);
         $this->views[$region][] = $view;
 
@@ -85,45 +112,14 @@ class CViewContainerBasic implements \Anax\DI\IInjectionAware
      *
      * @return $this
      */
-    public function addString($content, $region = 'main', $sort = 0)
+    public function addString($content, $region = "main", $sort = 0)
     {
-        $view = $this->di->get('view');
-        $view->set($content, [], $sort, 'string');
+        $view = $this->di->get("view");
+        $view->set($content, [], $sort, "string");
         $view->setDI($this->di);
         $this->views[$region][] = $view;
         
         return $this;
-    }
-
-
-
-    /**
-     * Set the suffix of the template files to include.
-     *
-     * @param string $suffix file suffix of template files, append to filenames for template files
-     *
-     * @return $this
-     */
-    public function setFileSuffix($suffix)
-    {
-        $this->suffix = $suffix;
-    }
-
-
-
-    /**
-     * Set base path where  to find views.
-     *
-     * @param string $path where all views reside
-     *
-     * @return $this
-     */
-    public function setBasePath($path)
-    {
-        if (!is_dir($path)) {
-            throw new \Exception("Base path for views is not a directory: " . $path);
-        }
-        $this->path = rtrim($path, '/') . '/';
     }
 
 
@@ -149,7 +145,7 @@ class CViewContainerBasic implements \Anax\DI\IInjectionAware
      *
      * @return $this
      */
-    public function render($region = 'main')
+    public function render($region = "main")
     {
         if (!isset($this->views[$region])) {
             return $this;

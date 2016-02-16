@@ -9,7 +9,7 @@ return [
     "basepath" => ANAX_APP_PATH . "/content",
 
     // Default options for textfilter
-    "textfilter" => ["jsonfrontmatter", "yamlfrontmatter", "shortcode", "markdown"],
+    "textfilter" => ["jsonfrontmatter", "yamlfrontmatter", "shortcode", "markdown", "titlefromh1"],
 
     // Default view
     "view" => "default/article",

@@ -2,56 +2,118 @@
 #
 #
 
+# ------------------------------------------------------------------------
 #
-# Update codebase
+# General and combined targets
 #
-.PHONY: codebase-update
-codebase-update:
+
+# target: all - Default target, run tests and build
+.PHONY:  all
+all: test build
+
+
+# target: test - Do all tests
+.PHONY:  prepare test
+#test: js-cs js-hint less-lint html-lint
+test: phpunit phpcs phpmd
+
+
+
+# target: build - Do all build
+.PHONY:  build
+build: test doc #less-compile less-minify js-minify
+
+
+
+# target: doc - Generate documentation.
+.PHONY:  doc
+doc: phpdoc
+
+
+
+# target: prepare - Prepare for tests and build
+.PHONY:  prepare
+prepare:
+	[ -d build ] || mkdir build
+	rm -rf build/*
+
+
+
+# target: update - Update the codebase.
+.PHONY:  update
+update:
 	git pull
 	composer update
 
 
-# Build and development environment using make
+
+# target: clean - Removes generated files and directories.
+.PHONY:  clean
+clean:
+	@echo "Target clean not implemented."
+	#rm -f $(CSS_MINIFIED) $(JS_MINIFIED)
+
+
+
+# target: help - Displays help.
+.PHONY:  help
+help:
+	@echo "make [target] ..."
+	@echo "target:"
+	@egrep "^# target:" Makefile | sed 's/# target: / /g'
+
+
+
+# ------------------------------------------------------------------------
 #
-COMPOSER_PACKAGES = 					\
-	"phpunit/phpunit=4.*" 				\
-	"sebastian/phpcpd=2.*"				\
-	"phploc/phploc=2.*"					\
-	"phpdocumentor/phpdocumentor=2.*"	\
-	"squizlabs/php_codesniffer=2.*"		\
-	"phpmd/phpmd=@stable"				\
-
-NPM_PACKAGES = 							\
-	htmlhint							\
-	csslint								\
-	less								\
-
-APM_PACKAGES = 							\
-	linter 								\
-	linter-htmlhint 					\
-	linter-csslint 						\
-	linter-less 						\
-	linter-jscs 						\
-	linter-jshint 						\
-	linter-pep8 						\
-	linter-pylint 						\
-	linter-php 							\
-	linter-phpcs 						\
-	linter-phpmd 						\
-	linter-shellcheck 					\
-	linter-xmllint						\
-	block-travel 						\
-
-
-
+# PHP
 #
-# Various test to pass build
-#
-.PHONY: test
 
-test: phpunit phpcs
+# target: phpcs - Codestyle for PHP.
+.PHONY: phpcs
+
+phpcs:
+	@echo "==> PHP Codestyle"
+	phpcs --standard=.phpcs.xml | tee build/phpcs
 
 
+
+# target: phpcbf - Fix codestyle for PHP.
+.PHONY: phpcbf
+
+phpcbf:
+	@echo "==> PHP fix codestyle"
+	phpcbf --standard=.phpcs.xml
+
+
+
+# target: phpmd - Mess detector for PHP.
+.PHONY: phpmd
+
+phpmd:
+	@echo "==> PHP Mess detector"
+	- phpmd . text .phpmd.xml | tee build/phpmd
+
+
+# target: phpunit - Run unit tests for PHP.
+.PHONY: phpunit
+
+phpunit:
+	@echo "==> PHP unittests"
+	phpunit --configuration .phpunit.xml
+
+
+
+# target: phpdoc - Create documentation for PHP.
+.PHONY: phpdoc
+
+phpdoc:
+	@echo "==> Building documentation"
+	phpdoc --config=.phpdoc.xml
+
+
+
+# =================== REVISE BELOW ====================0
 
 #
 # less
@@ -60,97 +122,3 @@ test: phpunit phpcs
 
 less:
 	lessc --clean-css app/css/style.less htdocs/css/style.css
-
-
-
-#
-# phpcs
-#
-.PHONY: phpcs
-
-phpcs:
-	phpcs --standard=.phpcs.xml 
-
-
-
-#
-# phpcbf
-#
-.PHONY: phpcbf
-
-phpcbf:
-	phpcbf --standard=.phpcs.xml
-
-
-#
-# phpunit
-#
-.PHONY: phpunit
-
-phpunit:
-	phpunit --configuration .phpunit.xml
-
-
-
-#
-# phpdoc
-#
-.PHONY: phpdoc
-
-phpdoc:
-	phpdoc --config=.phpdoc.xml
-
-
-
-#
-# All developer tools
-#
-.PHONY: tools-config tools-install tools-update
-
-tools-config: npm-config
-	
-tools-install: composer-require npm-install apm-install
-
-tools-update: composer-update npm-update apm-update
-
-
-
-#
-# composer
-#
-.PHONY: composer-require composer-update
-
-composer-require: 
-	composer --sort-packages --update-no-dev global require $(COMPOSER_PACKAGES)
-
-composer-update:
-	composer --no-dev global update
-
-
-
-#
-# npm
-#
-.PHONY: npm-config npm-installl npm-update
-
-npm-config: 
-	npm config set prefix '~/.npm-packages'
-	
-npm-install: 
-	npm -g install $(NPM_PACKAGES)
-
-npm-update: 
-	npm -g update
-
-
-
-#
-# apm
-#
-.PHONY: apm-installl apm-update
-
-apm-install: 
-	apm install $(APM_PACKAGES)
-
-apm-update:
-	apm update --confirm=false

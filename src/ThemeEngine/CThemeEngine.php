@@ -6,7 +6,7 @@ namespace Anax\ThemeEngine;
  * Anax base class for wrapping sessions.
  *
  */
-class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
+class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
 {
     use \Anax\TConfigure,
         \Anax\DI\TInjectionAware;
@@ -17,6 +17,28 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
      * Array with variables to provide to theme template files.
      */
     protected $data = [];
+
+
+
+    /**
+     * Overwrite template file as defined in config.
+     */
+    protected $template = null;
+
+
+
+    /**
+     * Set another template file to use.
+     *
+     * @param string $name of the template file.
+     *
+     * @return $this
+     */
+    public function setTemplate($name)
+    {
+        $this->template = $name;
+        return $this;
+    }
 
 
 
@@ -73,7 +95,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
      */
     public function addFrontmatter($matter)
     {
-        $this->data = array_merge_recursive($this->data, $matter);
+        $this->data = array_merge($this->data, $matter);
         return $this;
     }
 
@@ -138,21 +160,30 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
     public function render()
     {
         // Prepare details
-        $path       = $this->config["settings"]["path"] . "/";
-        $name       = $this->config["settings"]["name"] . "/";
-        $template   = "index.tpl.php";
-        $functions  = "functions.php";
+        $path     = $this->config["settings"]["path"] . "/";
+        $template = $this->config["settings"]["template"];
+        $function = $this->config["settings"]["function"];
 
-        // Include theme specific functions file
-        $file = $path . $name . $functions;
+        // Include theme specific function file
+        $file = $path . $function;
         if (is_readable($file)) {
             include $file;
+        }
+
+        // Override configured template file
+        if (isset($this->template)) {
+            $template = $this->template;
         }
 
         // Create views for regions, from config-file
         if (isset($this->config["views"])) {
             foreach ($this->config["views"] as $view) {
-                $this->di->views->add($view["template"], $view["data"], $view["region"], $view["sort"]);
+                $this->di->views->add(
+                    $view["template"],
+                    $view["data"],
+                    $view["region"],
+                    $view["sort"]
+                );
             }
         }
 
@@ -160,7 +191,7 @@ class CThemeBasic implements IThemeEngine, \Anax\DI\IInjectionAware
         $this->di->response->sendHeaders();
 
         // Create a view to execute the default template file
-        $tpl  = $path . $name . $template;
+        $tpl  = $path . $template;
         $data = array_merge($this->config["data"], $this->data);
         $view = $this->di->get("view");
         $view->set($tpl, $data);

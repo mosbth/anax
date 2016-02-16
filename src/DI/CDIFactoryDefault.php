@@ -23,7 +23,7 @@ class CDIFactoryDefault extends CDI
         $this->setShared("flash", "\Anax\Flash\CFlashBasic");
         
         $this->set("route", "\Anax\Route\CRouteBasic");
-        $this->set("view", "\Anax\View\CViewBasic");
+        $this->set("view", "\Anax\View\CView");
 
         $this->set("ErrorController", function () {
             $controller = new \Anax\MVC\ErrorController();
@@ -61,9 +61,8 @@ class CDIFactoryDefault extends CDI
         });
 
         $this->setShared("views", function () {
-            $views = new \Anax\View\CViewContainerBasic();
-            $views->setBasePath(ANAX_APP_PATH . "/view");
-            $views->setFileSuffix(".tpl.php");
+            $views = new \Anax\View\CViewContainer();
+            $views->configure(ANAX_APP_PATH . "/config/views.php");
             $views->setDI($this);
             return $views;
         });
@@ -128,7 +127,7 @@ class CDIFactoryDefault extends CDI
         });
 
         $this->setShared("theme", function () {
-            $themeEngine = new \Anax\ThemeEngine\CThemeBasic();
+            $themeEngine = new \Anax\ThemeEngine\CThemeEngine();
             $themeEngine->setDI($this);
             $themeEngine->configure(ANAX_APP_PATH . "/config/theme.php");
             return $themeEngine;
