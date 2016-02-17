@@ -6,28 +6,45 @@
 return [
 
     /**
-     * Settings for Which theme to use, theme directory is found by path
-     * and name.
-     *
-     * path:      path to the theme directory, end without slash.
-     * template:  base template for the theme
-     * functions: file to include holding theme specific functions, or null
+     * Base view to start render page from.
      */
-    "settings" => [
-        "path"     => ANAX_INSTALL_PATH . "/theme/anax-base",
-        "template" => "index.tpl.php",
-        "function" => "function.php",
+    "view" => [
+        "template" => "anax-base/index",
+
+        "data" => [
+            // General
+            "htmlClass"     => [],
+            "bodyClass"     => [],
+            "lang"          => "sv",
+            "charset"       => "utf-8",
+            "title_append"  => " | Anax a web template",
+            "favicon"       => "favicon.ico",
+
+            // Style and stylesheets
+            "stylesheets" => ["css/anax-base.min.css"],
+            "styleInline" => null,
+
+            // JavaScript
+            "javascripts" => [],
+        ],
     ],
 
-    
+
+
     /**
-     * Add default views.
+     * Add default views to always include.
      */
     "views" => [
         [
             "region" => "header",
             "template" => "default/header",
-            "data" => [],
+            "data" => [
+                "homeLink"      => "",
+                "siteLogo"      => "img/anax.png",
+                "siteLogoAlt"   => "Anax Logo",
+                "siteTitle"     => "Anax PHP framework",
+                "siteSlogan"    => "Reusable modules for web development"
+            ],
             "sort" => -1
         ],
         [
@@ -39,42 +56,20 @@ return [
         [
             "region" => "footer",
             "template" => "default/footer",
-            "data" => [],
+            "data" => [
+                "copyrightNotice" => "Copyright (c) 2013-2016 Mikael Roos (mos@dbwebb.se)",
+                "linkToAnaxGitHub" => "https://github.com/mosbth/anax",
+                "linkTextToAnaxGitHub" => "Anax på GitHub",
+            ],
             "sort" => -1
         ],
-    ],
-
-
-    /**
-     * Data to extract and send as variables to the main template file.
-     */
-    "data" => [
-
-        // Language for this page.
-        "lang" => "sv",
-
-        // Append this value to each <title>
-        "title_append" => " | Anax a web template",
-
-        // Stylesheets
-        "stylesheets" => ["css/style.css"],
-
-        // Inline style
-        "style" => null,
-
-        // Favicon
-        "favicon" => "favicon.ico",
-
-        // Path to modernizr or null to disable
-        "modernizr" => "js/modernizr.js",
-
-        // Path to jquery or null to disable
-        "jquery" => "//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js",
-
-        // Array with javscript-files to include
-        "javascript_include" => [],
-
-        // Use google analytics for tracking, set key or null to disable
-        "google_analytics" => null,
+        [
+            "region" => "body-end",
+            "template" => "default/google-analytics",
+            "data" => [
+                "account" => null,
+            ],
+            "sort" => -1
+        ],
     ],
 ];

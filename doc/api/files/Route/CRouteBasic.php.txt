@@ -46,10 +46,35 @@ class CRouteBasic
      */
     public function match($query)
     {
-        if ($this->rule === $query) {
-            return true;
+        $ruleParts  = explode('/', $this->rule);
+        $queryParts = explode('/', $query);
+
+        $ruleCount = count($ruleParts);
+        //$querCount = count($queryParts);
+        
+        $match = false;
+        for ($i = 0; $i < $ruleCount; $i++) {
+            $rp = $ruleParts[$i];
+            $qp = isset($queryParts[$i]) ? $queryParts[$i] : null;
+            
+            $first = isset($rp[0]) ? $rp[0] : '';
+            switch ($first) {
+                case '*':
+                    $match = true;
+                    break;
+                
+                default:
+                    $match = ($rp == $qp);
+                    break;
+            }
+            
+            if (!$match) {
+                return false;
+            }
         }
-        return false;
+        
+        //echo "$this->rule == $query\n";
+        return true;
     }
 
 

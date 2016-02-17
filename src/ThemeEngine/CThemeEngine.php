@@ -159,43 +159,31 @@ class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
      */
     public function render()
     {
-        // Prepare details
-        $path     = $this->config["settings"]["path"] . "/";
-        $template = $this->config["settings"]["template"];
-        $function = $this->config["settings"]["function"];
-
-        // Include theme specific function file
-        $file = $path . $function;
-        if (is_readable($file)) {
-            include $file;
-        }
-
-        // Override configured template file
-        if (isset($this->template)) {
-            $template = $this->template;
-        }
-
         // Create views for regions, from config-file
         if (isset($this->config["views"])) {
             foreach ($this->config["views"] as $view) {
-                $this->di->views->add(
-                    $view["template"],
-                    $view["data"],
-                    $view["region"],
-                    $view["sort"]
-                );
+                $this->di->views->add($view);
             }
         }
 
-        // Sen response headers, if any.
+        // Get default view to start render from
+        $view = $this->config["view"];
+        $view["data"] = array_merge($view["data"], $this->data);
+
+        if (isset($this->template)) {
+            $view["template"] = $this->template;
+        }
+
+        // Get the path to the view template file
+        $view["template"] = $this->di->get("views")->getTemplateFile($view["template"]);
+
+        // Send response headers, if any.
         $this->di->response->sendHeaders();
 
-        // Create a view to execute the default template file
-        $tpl  = $path . $template;
-        $data = array_merge($this->config["data"], $this->data);
-        $view = $this->di->get("view");
-        $view->set($tpl, $data);
-        $view->setDI($this->di);
-        $view->render();
+        // Execute the default view
+        $start = $this->di->get("view");
+        $start->setDI($this->di);
+        $start->set($view);
+        $start->render();
     }
 }

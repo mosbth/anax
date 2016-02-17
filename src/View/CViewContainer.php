@@ -64,11 +64,25 @@ class CViewContainer implements \Anax\DI\IInjectionAware
         if (is_string($template)) {
             $tpl = $this->getTemplateFile($template);
             $type = "file";
-        } elseif (is_array($template)) {
-            $tpl = $template;
 
-            if (isset($tpl["template"])) {
-                $tpl["template"] = $this->getTemplateFile($tpl["template"]);
+        } elseif (is_array($template)) {
+            // Can be array with complete view or array with callback
+            $tpl = $template;
+            $type = null;
+            $region = isset($tpl["region"])
+                ? $tpl["region"]
+                : $region;
+
+            if (isset($tpl["callback"])) {
+                $tpl["template"] = $template;
+                $tpl["type"] = "callback";
+
+            } elseif (isset($tpl["template"])) {
+
+                if (!isset($tpl["type"]) || $tpl["type"] === "file" ) {
+                    $tpl["type"] = "file";
+                    $tpl["template"] = $this->getTemplateFile($tpl["template"]);
+                }
             }
         }
 

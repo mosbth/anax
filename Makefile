@@ -64,6 +64,14 @@ help:
 
 
 
+# target: cache - Create the cache directory.
+.PHONY: cache
+cache:
+	mkdir app/cache
+	chmod 777 app/cache
+
+
+
 # ------------------------------------------------------------------------
 #
 # PHP
@@ -72,7 +80,7 @@ help:
 # target: phpcs - Codestyle for PHP.
 .PHONY: phpcs
 
-phpcs:
+phpcs: prepare
 	@echo "==> PHP Codestyle"
 	phpcs --standard=.phpcs.xml | tee build/phpcs
 
@@ -90,7 +98,7 @@ phpcbf:
 # target: phpmd - Mess detector for PHP.
 .PHONY: phpmd
 
-phpmd:
+phpmd: prepare
 	@echo "==> PHP Mess detector"
 	- phpmd . text .phpmd.xml | tee build/phpmd
 
@@ -98,7 +106,7 @@ phpmd:
 # target: phpunit - Run unit tests for PHP.
 .PHONY: phpunit
 
-phpunit:
+phpunit: prepare
 	@echo "==> PHP unittests"
 	phpunit --configuration .phpunit.xml
 

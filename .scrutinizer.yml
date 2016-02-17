@@ -5,10 +5,16 @@ filter:
     excluded_paths: [vendor/*, test/*]
 
 build:
+
+    dependencies:
+        before:
+            -
+                command: "mkdir build"
+
     tests:
         override:
             -
-                command: 'phpunit --configuration .phpunit.xml'
+                command: "phpunit --configuration .phpunit.xml"
                 coverage:
-                    file: 'coverage.clover'
-                    format: 'php-clover'
+                    file: "build/coverage.clover"
+                    format: "php-clover"
