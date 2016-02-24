@@ -8,7 +8,8 @@ namespace Anax\ThemeEngine;
  */
 class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
 {
-    use \Anax\TConfigure,
+    use \Anax\View\THelpers,
+        \Anax\TConfigure,
         \Anax\DI\TInjectionAware;
 
 
@@ -167,8 +168,11 @@ class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
         }
 
         // Get default view to start render from
+        $defaultData = [
+            "currentRoute" => "route-" . str_replace("/", "-", $this->di->get("request")->getRoute()),
+        ];
         $view = $this->config["view"];
-        $view["data"] = array_merge($view["data"], $this->data);
+        $view["data"] = array_merge($defaultData, $this->data, $view["data"]);
 
         if (isset($this->template)) {
             $view["template"] = $this->template;
@@ -178,7 +182,7 @@ class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
         $view["template"] = $this->di->get("views")->getTemplateFile($view["template"]);
 
         // Send response headers, if any.
-        $this->di->response->sendHeaders();
+        $this->di->get("response")->sendHeaders();
 
         // Execute the default view
         $start = $this->di->get("view");

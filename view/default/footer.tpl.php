@@ -1,4 +1,10 @@
 <p>
-    <?= $copyrightNotice ?> | 
-    <a href="<?= $linkToAnaxGitHub ?>"><?= $linkTextToAnaxGitHub ?></a>
+    <?= $copyrightNotice ?>
 </p>
+
+<?php if ($links) : 
+    $this->renderView("default/link-list", [
+        "links" => $links,
+        "class" => "footer-site-links"
+    ]); 
+endif; ?>

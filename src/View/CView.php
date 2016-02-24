@@ -8,7 +8,8 @@ namespace Anax\View;
  */
 class CView implements \Anax\DI\IInjectionAware
 {
-    use \Anax\DI\TInjectable;
+    use THelpers,
+        \Anax\DI\TInjectionAware;
 
 
 
@@ -65,6 +66,8 @@ class CView implements \Anax\DI\IInjectionAware
         $this->templateData = $data;
         $this->sortOrder    = $sort;
         $this->type         = $type;
+
+        return $this;
     }
 
 

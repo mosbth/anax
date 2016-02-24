@@ -31,8 +31,8 @@ class CUrl
     /**
      * Create an url and prepending the baseUrl.
      *
-     * @param string $uri part of uri to use when creating an url. "" or null means baseurl to
-     * current frontcontroller.
+     * @param string $uri part of uri to use when creating an url. "" or null
+     *                    means baseurl to current frontcontroller.
      *
      * @return string as resulting url.
      */

@@ -1,1 +1,1 @@
-<?= $this->navbar->create() ?>
+<?= $this->di->get("navbar")->create() ?>
