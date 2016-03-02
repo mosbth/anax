@@ -41,7 +41,10 @@ class CNavbar
             $callback,
             $ulId = null,
             $ulClass = null
-        ) use (&$createMenu, $menu) {
+        ) use (
+            &$createMenu,
+            $menu
+) {
 
             $html = null;
             $hasItemIsSelected = false;
