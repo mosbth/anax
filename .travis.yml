@@ -39,6 +39,7 @@ before_script:
     # Store all files in your own bin
     - mkdir bin
     - export PATH=$PATH:$PWD/bin/
+    - composer selfupdate
 
 
     # Install validation tools
