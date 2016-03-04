@@ -2,8 +2,10 @@
  *
  * Theme: anax-base
  */
+@magicNumber: 22px;
 
 @import url(navbar.less);
+@import url(link-list.less);
 
 body {
     color: #333;
@@ -69,11 +71,21 @@ h1 {
  *
  * Layout for footer
  */
+@footerColor: #666;
+
 .sitefooter {
     margin-top: 40px;
     border-top: 1px solid #ccc;
-    padding-top: 22px;
-    color: #666;
+    padding-top: @magicNumber;
+    color: @footerColor;
+    
+    a {
+        color: inherit;
+        
+        &:hover {
+            text-decoration: none;
+        }
+    }
 }
 
 

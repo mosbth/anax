@@ -58,8 +58,16 @@ return [
             "template" => "default/footer",
             "data" => [
                 "copyrightNotice" => "Copyright (c) 2013-2016 Mikael Roos (mos@dbwebb.se)",
-                "linkToAnaxGitHub" => "https://github.com/mosbth/anax",
-                "linkTextToAnaxGitHub" => "Anax på GitHub",
+                "links" => [
+                    [
+                        "text" => "Licenses and terms",
+                        "url"  => "license"
+                    ],
+                    [
+                        "text" => "About Cookies",
+                        "url"  => "cookies"
+                    ]
+                ],
             ],
             "sort" => -1
         ],

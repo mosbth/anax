@@ -1,6 +1,4 @@
-Markdown file content (doc)
+Introduction
 ==========================================
 
 This is a markdown sample file.
-
-[Another page](testpage).

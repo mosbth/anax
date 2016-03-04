@@ -1,6 +1,9 @@
 ---
-meta:
-    - title:    About page title 
+title: About page title
+view: default/test
+data:
+    - moped: masken
+aar: mega
 ---
 About page
 ===============

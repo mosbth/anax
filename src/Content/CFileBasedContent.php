@@ -138,6 +138,7 @@ class CFileBasedContent
         // Settings from config
         $basepath = $this->config["basepath"];
         $filter   = $this->config["textfilter"];
+        $view     = $this->config["view"];
 
         // Get the route
         $route = $this->di->request->getRoute();
@@ -161,8 +162,13 @@ class CFileBasedContent
         $filtered = $this->di->textFilter->parse($src, $filter);
         //$frontmatter = $this->di->textFilter->yamlFrontMatter($src);
 
+        var_dump($filtered);
+
         $content["frontmatter"] = $filtered->frontmatter;
-        $content["text"]        = $filtered->text;
+        $content["text"] = $filtered->text;
+        $content["view"] = isset($filterd->view)
+            ? $filterd->view
+            : $view;
 
         return (object) $content;
     }
