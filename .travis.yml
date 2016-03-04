@@ -4,7 +4,7 @@ php:
     #- 5.4
     #- 5.5
     - 5.6
-    #- hhvm
+    - hhvm
     - nightly
     - "7.0"
 
@@ -31,6 +31,7 @@ addons:
 matrix:
     allow_failures:
         - php: nightly
+        - php: hhvm
 
 
 
