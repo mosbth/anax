@@ -8,6 +8,33 @@ namespace Anax\DI;
  */
 class CDIFactoryDefault extends CDI
 {
+    /**
+     * Load config file from ANAX_APP_PATH or ANAX_INSTALL_PATH.
+     *
+     * @param string $filename to load.
+     *
+     * @throws Exception when $filenam is not found.
+     *
+     * @return void
+     */
+    public function loadFile($filename)
+    {
+        $pathInstall = ANAX_INSTALL_PATH . "/config/$filename";
+        $pathApp = ANAX_APP_PATH . "/config/$filename";
+        
+        if (is_readable($pathApp)) {
+            require $pathApp;
+            return;
+        } elseif (is_readable($pathInstall)) {
+            require $pathInstall;
+            return;
+        }
+
+        throw new Exception("Configure item '$filename' is not a readable file.");
+    }
+
+
+
    /**
      * Construct.
      *
@@ -16,7 +43,7 @@ class CDIFactoryDefault extends CDI
     {
         parent::__construct();
 
-        require ANAX_APP_PATH . "/config/error_reporting.php";
+        $this->loadFile("error_reporting.php");
 
         $this->setShared("response", "\Anax\Response\CResponseBasic");
         $this->setShared("validate", "\Anax\Validate\CValidate");
@@ -39,7 +66,7 @@ class CDIFactoryDefault extends CDI
 
         $this->setShared("cache", function () {
             $cache = new \Anax\Cache\CFileCache();
-            $cache->configure(ANAX_APP_PATH . "/config/cache.php");
+            $cache->configure("cache.php");
             return $cache;
         });
 
@@ -62,7 +89,7 @@ class CDIFactoryDefault extends CDI
 
         $this->setShared("views", function () {
             $views = new \Anax\View\CViewContainer();
-            $views->configure(ANAX_APP_PATH . "/config/views.php");
+            $views->configure("views.php");
             $views->setDI($this);
             return $views;
         });
@@ -120,7 +147,7 @@ class CDIFactoryDefault extends CDI
 
         $this->setShared("session", function () {
             $session = new \Anax\Session\CSession();
-            $session->configure(ANAX_APP_PATH . "/config/session.php");
+            $session->configure("session.php");
             $session->name();
             $session->start();
             return $session;
@@ -129,35 +156,35 @@ class CDIFactoryDefault extends CDI
         $this->setShared("theme", function () {
             $themeEngine = new \Anax\ThemeEngine\CThemeEngine();
             $themeEngine->setDI($this);
-            $themeEngine->configure(ANAX_APP_PATH . "/config/theme.php");
+            $themeEngine->configure("theme.php");
             return $themeEngine;
         });
 
         $this->setShared("navbar", function () {
             $navbar = new \Anax\Navigation\CNavbar();
             $navbar->setDI($this);
-            $navbar->configure(ANAX_APP_PATH . "/config/navbar.php");
+            $navbar->configure("navbar.php");
             return $navbar;
         });
 
         $this->set("fileContent", function () {
             $fc = new \Anax\Content\CFileContent();
             $fc->setDI($this);
-            $fc->configure(ANAX_APP_PATH . "/config/file_content.php");
+            $fc->configure("file_content.php");
             return $fc;
         });
 
         $this->set("pageContent", function () {
             $pc = new \Anax\Content\CPageContent();
             $pc->setDI($this);
-            $pc->configure(ANAX_APP_PATH . "/config/page_content.php");
+            $pc->configure("page_content.php");
             return $pc;
         });
 
         $this->set("content", function () {
             $content = new \Anax\Content\CFileBasedContent();
             $content->setDI($this);
-            $content->configure(ANAX_APP_PATH . "/config/content.php");
+            $content->configure("content.php");
             return $content;
         });
 

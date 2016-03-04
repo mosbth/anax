@@ -2,7 +2,7 @@
 
 <?php $i = 1; foreach ($columns as $column) : ?>
     <div class="<?= $class ?>">
-        <div class="<?= "$class-$i" ?>">
+        <div class="<?= "$class-x $class-$i" ?>">
 
             <h4><?= $column["header"] ?></h4>
 

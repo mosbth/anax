@@ -1,16 +1,16 @@
 <!doctype html>
-<html class="<?= implode(", ", $htmlClass) ?>" lang="<?= $lang ?>">
+<html <?= $this->classList($htmlClass) ?> lang="<?= $lang ?>">
 <head>
 
     <meta charset="<?= $charset ?>">
     <title><?= $title . $title_append ?></title>
 
     <?php if (isset($favicon)) : ?>
-    <link rel="icon" href="<?= $this->url->asset($favicon) ?>">
+    <link rel="icon" href="<?= $this->asset($favicon) ?>">
     <?php endif; ?>
 
     <?php foreach ($stylesheets as $stylesheet) : ?>
-    <link rel="stylesheet" type="text/css" href="<?= $this->url->asset($stylesheet) ?>">
+    <link rel="stylesheet" type="text/css" href="<?= $this->asset($stylesheet) ?>">
     <?php endforeach; ?>
 
     <?php if (isset($style)) : ?>
@@ -19,36 +19,36 @@
 
 </head>
 
-<body class="<?= implode(", ", $bodyClass) ?>">
+<body <?= $this->classList($bodyClass, $currentRoute) ?>>
 
 <!-- wrapper around all items on page -->
 <div class="wrapper">
 
 <!-- siteheader -->
-<?php if ($this->views->hasContent("header")) : ?>
+<?php if ($this->regionHasContent("header")) : ?>
 <header class="siteheader">
-<?php $this->views->render("header")?>
+<?php $this->renderRegion("header")?>
 </header>
 <?php endif; ?>
 
 <!-- navbar -->
-<?php if ($this->views->hasContent("navbar")) : ?>
+<?php if ($this->regionHasContent("navbar")) : ?>
 <nav class="navbar">
-<?php $this->views->render("navbar")?>
+<?php $this->renderRegion("navbar")?>
 </nav>
 <?php endif; ?>
 
 <!-- main -->
-<?php if ($this->views->hasContent("main")) : ?>
+<?php if ($this->regionHasContent("main")) : ?>
 <main class="main">
-<?php $this->views->render("main")?>
+<?php $this->renderRegion("main")?>
 </main>
 <?php endif; ?>
 
 <!-- sitefooter -->
-<?php if ($this->views->hasContent("footer")) : ?>
+<?php if ($this->regionHasContent("footer")) : ?>
 <footer class="sitefooter">
-<?php $this->views->render("footer")?>
+<?php $this->renderRegion("footer")?>
 </footer>
 <?php endif; ?>
 
@@ -56,12 +56,12 @@
 
 <!-- render javascripts -->
 <?php if (isset($javascripts)) : foreach ($javascripts as $javascript) : ?>
-<script src="<?=$this->url->asset($javascript)?>"></script>
+<script src="<?=$this->asset($javascript)?>"></script>
 <?php endforeach; endif; ?>
 
 <!-- useful for inline javascripts such as google analytics-->
-<?php if ($this->views->hasContent("body-end")) : ?>
-<?php $this->views->render("body-end")?>
+<?php if ($this->regionHasContent("body-end")) : ?>
+<?php $this->renderRegion("body-end")?>
 <?php endif; ?>
 
 </body>
