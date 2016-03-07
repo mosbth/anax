@@ -59,6 +59,10 @@ class CViewContainer implements \Anax\DI\IInjectionAware
      */
     public function add($template, $data = [], $region = "main", $sort = 0)
     {
+        if (empty($template)) {
+            return $this;
+        }
+
         $view = $this->di->get("view");
 
         if (is_string($template)) {

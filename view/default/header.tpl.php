@@ -20,11 +20,9 @@
 </nav>
 <?php endif; ?>
 
-<nav class="search" role="navigation">
-    <div>
-        <a href="<?=$this->url("")?>" class="search-link" title="<?= t("Search this site") ?>"><i class="fa fa-search fa-lg"></i></a>
-    </div>
-</nav>
+<?php if ($this->regionHasContent("search")) : ?>
+    <?php $this->renderRegion("search") ?>
+<?php endif; ?>
 
 <?php if (isset($siteTitle)) : ?>
 <span class="site-title"><?= $siteTitle ?></span>

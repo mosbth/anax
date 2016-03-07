@@ -1,6 +1,7 @@
 ---
-data:
-    somevar2: Another value from article
+view:
+    data:
+        somevar2: Another value from article
 ---
 Introduction
 ==========================================

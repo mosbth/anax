@@ -21,7 +21,8 @@ return [
             "favicon"       => "favicon.ico",
 
             // Style and stylesheets
-            "stylesheets" => ["css/anax-base.min.css"],
+            //"stylesheets" => ["css/anax-base.min.css"],
+            "stylesheets" => ["css/mos-theme.css"],
             "styleInline" => null,
 
             // JavaScript
@@ -48,7 +49,7 @@ return [
             "sort" => -1
         ],
         [
-            "region" => "navbar",
+            "region" => "navbar1",
             "template" => "default/navbar",
             "data" => [],
             "sort" => -1

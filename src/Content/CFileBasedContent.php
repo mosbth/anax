@@ -165,7 +165,7 @@ class CFileBasedContent
             
             // Add Toc to the data array
             if (isset($meta[$key]["toc"])) {
-                $meta[$key]["toc"]["data"]["toc"] = $this->createRouteToc(dirname($filepath));
+                $meta[$key]["toc"]["data"]["toc"] = $this->createBaseRouteToc(dirname($filepath));
             }
         }
 
@@ -218,7 +218,7 @@ class CFileBasedContent
      *
      * @return array as the toc.
      */
-    private function createRouteToc($route)
+    private function createBaseRouteToc($route)
     {
         $toc = [];
         $len = strlen($route);
@@ -261,24 +261,18 @@ class CFileBasedContent
      * Set the template to use.
      *
      * @param string $route       current route used to access page.
-     * @param array  $frontmatter for the content.
      *
      * @return template to use for content.
      */
-    private function getTemplate($route, $frontmatter)
+    private function getTemplate($route)
     {
         // Default from config
         $template = $this->config["template"];
 
         // From meta frontmatter
         $meta = $this->getMetaForRoute($route);
-        if ($meta && $meta["template"]) {
+        if ($meta && isset($meta["template"])) {
             $template = $meta["template"];
-        }
-
-        // From document frontmatter
-        if (isset($frontmatter["template"])) {
-            $template = $frontmatter["template"];
         }
 
         return $template;
@@ -294,7 +288,7 @@ class CFileBasedContent
      *
      * @return array with page data to send to view.
      */
-    private function getPageData($route, $frontmatter)
+/*    private function getPageData($route, $frontmatter)
     {
         $data = [];
 
@@ -310,7 +304,7 @@ class CFileBasedContent
         }
 
         return $data;
-    }
+    }*/
 
 
 
@@ -328,8 +322,8 @@ class CFileBasedContent
 
         // From meta frontmatter
         $meta = $this->getMetaForRoute($route);
-        if ($meta && $meta["toc"]) {
-            $toc = array_merge($toc, $meta["toc"]);
+        if ($meta && isset($meta["toc"])) {
+            $toc = $meta["toc"];
         }
 
         // From document frontmatter
@@ -338,6 +332,34 @@ class CFileBasedContent
         }
 
         return $toc;
+    }
+
+
+
+    /**
+     * Get main content as view.
+     *
+     * @param string $route       current route used to access page.
+     * @param array  $frontmatter for the content.
+     *
+     * @return array with TOC data to add as view.
+     */
+    private function getMainView($route, $frontmatter)
+    {
+        $main = [];
+
+        // From meta frontmatter
+        $meta = $this->getMetaForRoute($route);
+        if ($meta && isset($meta["main"])) {
+            $main = $meta["main"];
+        }
+
+        // From document frontmatter
+        if (isset($frontmatter["view"])) {
+            $main = array_merge_recursive_distinct($main, $frontmatter["view"]);
+        }
+
+        return $main;
     }
 
 
@@ -356,8 +378,8 @@ class CFileBasedContent
 
         // From meta frontmatter
         $meta = $this->getMetaForRoute($route);
-        if ($meta && $meta["views"]) {
-            $views = array_merge($views, $meta["views"]);
+        if ($meta && isset($meta["views"])) {
+            $views = $meta["views"];
         }
 
         // From document frontmatter
@@ -365,7 +387,12 @@ class CFileBasedContent
             $views = array_merge($views, $frontmatter["views"]);
         }
 
-        $views[] = $this->getTocView($route, $frontmatter);
+        // Add standard views if they exists
+        $views["toc"] = $this->getTocView($route, $frontmatter);
+        $views["main"] = $this->getMainView($route, $frontmatter);
+        if (!isset($views["main"]["template"])) {
+            $views["main"]["template"] = $this->getTemplate($route);
+        }
 
         return $views;
     }
@@ -408,10 +435,10 @@ class CFileBasedContent
         $frontmatter = $filtered->frontmatter;
         $content["src"] = $src;
         $content["frontmatter"] = $frontmatter;
-        $content["template"] = $this->getTemplate($key, $frontmatter);
-        $content["data"] = $this->getPageData($key, $frontmatter);
-        $content["data"]["content"] = $filtered->text;
+        //$content["template"] = $this->getTemplate($key, $frontmatter);
+        //$content["data"] = $this->getPageData($key, $frontmatter);
         $content["views"] = $this->getViews($key, $frontmatter);
+        $content["views"]["main"]["data"]["content"] = $filtered->text;
 
         return (object) $content;
     }
