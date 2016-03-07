@@ -281,34 +281,6 @@ class CFileBasedContent
 
 
     /**
-     * Get page data to send to template.
-     *
-     * @param string $route       current route used to access page.
-     * @param array  $frontmatter for the content.
-     *
-     * @return array with page data to send to view.
-     */
-/*    private function getPageData($route, $frontmatter)
-    {
-        $data = [];
-
-        // From meta frontmatter
-        $meta = $this->getMetaForRoute($route);
-        if ($meta && $meta["data"]) {
-            $data = array_merge($data, $meta["data"]);
-        }
-
-        // From document frontmatter
-        if (isset($frontmatter["data"])) {
-            $data = array_merge($data, $frontmatter["data"]);
-        }
-
-        return $data;
-    }*/
-
-
-
-    /**
      * Get TOC as view.
      *
      * @param string $route       current route used to access page.
@@ -431,12 +403,13 @@ class CFileBasedContent
         $src = file_get_contents($path);
         $filtered = $this->di->textFilter->parse($src, $filter);
 
-        // Create the content
         $frontmatter = $filtered->frontmatter;
-        $content["src"] = $src;
+
+        // TODO Should not supply all frontmatter to content, only the
+        // parts valid to the index template. Everything else goes in the views
         $content["frontmatter"] = $frontmatter;
-        //$content["template"] = $this->getTemplate($key, $frontmatter);
-        //$content["data"] = $this->getPageData($key, $frontmatter);
+
+        // Create the content as views
         $content["views"] = $this->getViews($key, $frontmatter);
         $content["views"]["main"]["data"]["content"] = $filtered->text;
 
