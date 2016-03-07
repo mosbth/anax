@@ -17,10 +17,16 @@ return [
         "titlefromh1"
     ],
 
-    // Default view
-    "view" => "default/article",
+    "metafilter" => [
+        "jsonfrontmatter",
+        "yamlfrontmatter",
+    ],
+
+    // Default template
+    "template" => "default/article",
 
     // Filter to load content
     "pattern" => "*.md",
+    "meta" => ".meta.md",
 
 ];

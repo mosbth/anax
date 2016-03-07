@@ -1,3 +1,7 @@
+---
+data:
+    somevar2: Another value from article
+---
 Introduction
 ==========================================
 

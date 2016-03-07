@@ -1,3 +1,6 @@
+---
+title: Testpage 1 another title
+---
 Testpage 1
 ==========================================
 
