@@ -228,7 +228,7 @@ class CFileBasedContent
                 $toc[$key] = $value;
                 $toc[$key]["title"] = $this->getTitle($value["file"]);
             }
-        };
+        }
 
         return $toc;
     }
