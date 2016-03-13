@@ -153,7 +153,7 @@ class CFileBasedContent
         $filter   = $this->config["metafilter"];
         $meta     = $this->config["meta"];
         $path     = "$basepath/$meta";
-        
+
         $meta = [];
         foreach (glob_recursive($path) as $file) {
             $filepath = substr($file, strlen($basepath) + 1);
@@ -228,7 +228,7 @@ class CFileBasedContent
                 $toc[$key] = $value;
                 $toc[$key]["title"] = $this->getTitle($value["file"]);
             }
-        }
+        };
 
         return $toc;
     }
@@ -258,80 +258,35 @@ class CFileBasedContent
 
 
     /**
-     * Set the template to use.
-     *
-     * @param string $route       current route used to access page.
-     *
-     * @return template to use for content.
-     */
-    private function getTemplate($route)
-    {
-        // Default from config
-        $template = $this->config["template"];
-
-        // From meta frontmatter
-        $meta = $this->getMetaForRoute($route);
-        if ($meta && isset($meta["template"])) {
-            $template = $meta["template"];
-        }
-
-        return $template;
-    }
-
-
-
-    /**
-     * Get TOC as view.
+     * Get view by mergin information from meta and frontmatter.
      *
      * @param string $route       current route used to access page.
      * @param array  $frontmatter for the content.
+     * @param string $key         for the view to retrive.
+     * @param string $distinct    how to merge the array.
      *
-     * @return array with TOC data to add as view.
+     * @return array with data to add as view.
      */
-    private function getTocView($route, $frontmatter)
+    private function getView($route, $frontmatter, $key, $distinct = true)
     {
-        $toc = [];
+        $view = [];
 
         // From meta frontmatter
         $meta = $this->getMetaForRoute($route);
-        if ($meta && isset($meta["toc"])) {
-            $toc = $meta["toc"];
+        if ($meta && isset($meta[$key])) {
+            $view = $meta[$key];
         }
 
         // From document frontmatter
-        if (isset($frontmatter["views"])) {
-            $toc = array_merge($toc, $frontmatter["toc"]);
+        if (isset($frontmatter[$key])) {
+            if ($distinct) {
+                $view = array_merge_recursive_distinct($view, $frontmatter[$key]);
+            } else {
+                $view = array_merge($view, $frontmatter[$key]);
+            }
         }
 
-        return $toc;
-    }
-
-
-
-    /**
-     * Get main content as view.
-     *
-     * @param string $route       current route used to access page.
-     * @param array  $frontmatter for the content.
-     *
-     * @return array with TOC data to add as view.
-     */
-    private function getMainView($route, $frontmatter)
-    {
-        $main = [];
-
-        // From meta frontmatter
-        $meta = $this->getMetaForRoute($route);
-        if ($meta && isset($meta["main"])) {
-            $main = $meta["main"];
-        }
-
-        // From document frontmatter
-        if (isset($frontmatter["view"])) {
-            $main = array_merge_recursive_distinct($main, $frontmatter["view"]);
-        }
-
-        return $main;
+        return $view;
     }
 
 
@@ -346,24 +301,12 @@ class CFileBasedContent
      */
     private function getViews($route, $frontmatter)
     {
-        $views = [];
+        $views = $this->getView($route, $frontmatter, "views", false);
+        $views["toc"]  = $this->getView($route, $frontmatter, "toc");
+        $views["main"] = $this->getView($route, $frontmatter, "main");
 
-        // From meta frontmatter
-        $meta = $this->getMetaForRoute($route);
-        if ($meta && isset($meta["views"])) {
-            $views = $meta["views"];
-        }
-
-        // From document frontmatter
-        if (isset($frontmatter["views"])) {
-            $views = array_merge($views, $frontmatter["views"]);
-        }
-
-        // Add standard views if they exists
-        $views["toc"] = $this->getTocView($route, $frontmatter);
-        $views["main"] = $this->getMainView($route, $frontmatter);
         if (!isset($views["main"]["template"])) {
-            $views["main"]["template"] = $this->getTemplate($route);
+            $views["main"]["template"] = $this->config["template"];
         }
 
         return $views;
@@ -372,23 +315,66 @@ class CFileBasedContent
 
 
     /**
-     * Map url to content if such mapping can be done.
+     * Load extra info intro views based of meta information provided in each
+     * view.
+     *
+     * @param array &$views array with all views.
      *
      * @throws NotFoundException when mapping can not be done.
+     *
+     * @return void.
      */
-    public function contentForRoute()
+    private function loadAdditionalContent(&$views)
+    {
+        foreach ($views as $id => $view) {
+            $meta = isset($view["data"]["meta"])
+                ? $view["data"]["meta"]
+                : null;
+
+            if (is_array($meta)) {
+                switch ($meta["type"]) {
+                    case "multi":
+                    
+                    break;
+                    
+                    case "single":
+                        // Get filtered content from route
+                        list(, , $filtered) = 
+                            $this->mapRoute2Content($meta["route"]);
+                        
+                        // From document frontmatter
+                        $frontmatter = $filtered->frontmatter;
+                        $view["data"] = array_merge_recursive_distinct($view["data"], $frontmatter);
+
+                        $view["data"]["content"] = $filtered->text;
+                        $views[$id] = $view;
+                    break;
+                    
+                    default:
+                        throw new Exception(t("Unsupported data/meta/type."));
+                }
+            }
+        }
+    }
+
+
+
+    /**
+     * Load extra info intro views based of meta information provided in each
+     * view.
+     *
+     * @param string $key     array with all views.
+     * @param string $content array with all views.
+     *
+     * @throws NotFoundException when mapping can not be done.
+     *
+     * @return void.
+     */
+    private function loadFileContent($key, $content)
     {
         // Settings from config
         $basepath = $this->config["basepath"];
         $filter   = $this->config["textfilter"];
-
-        // Get the route
-        $route = $this->di->request->getRoute();
-
-        // Load index and map route to entry
-        $this->loadIndex();
-        $this->loadMetaIndex();
-        list($key, $content) = $this->mapRoute2Index($route);
 
         // Whole path to file
         $path = $basepath . "/" . $content["file"];
@@ -403,15 +389,62 @@ class CFileBasedContent
         $src = file_get_contents($path);
         $filtered = $this->di->textFilter->parse($src, $filter);
 
-        $frontmatter = $filtered->frontmatter;
+        return [$content, $filtered];
+    }
 
-        // TODO Should not supply all frontmatter to content, only the
-        // parts valid to the index template. Everything else goes in the views
-        $content["frontmatter"] = $frontmatter;
 
-        // Create the content as views
-        $content["views"] = $this->getViews($key, $frontmatter);
+
+    /**
+     * Look up the route in the index and use that to retrieve the filtered
+     * content.
+     *
+     * @param string $route to look up.
+     *
+     * @return array with content and filtered version.
+     */
+    public function mapRoute2Content($route)
+    {
+        // Look it up in the index
+        list($keyIndex, $content) = $this->mapRoute2Index($route);
+        list($content, $filtered) = $this->loadFileContent($keyIndex, $content);
+        
+        return [$keyIndex, $content, $filtered];
+    }
+
+
+
+    /**
+     * Map url to content if such mapping can be done.
+     *
+     */
+    public function contentForRoute()
+    {
+        // Get the route
+        $route = $this->di->request->getRoute();
+
+        // TODO cache route content.
+
+        // Load index and map route to content
+        $this->loadIndex();
+        $this->loadMetaIndex();
+        list($keyIndex, $content, $filtered) = $this->mapRoute2Content($route);
+
+        // TODO Should not supply all frontmatter to theme, only the
+        // parts valid to the index template. Separate that data into own
+        // holder in frontmatter. Do not include whole frontmatter? Only 
+        // on debg?
+        $content["frontmatter"] = $filtered->frontmatter;
+
+        // Create and arrange the content as views
+        $content["views"] = $this->getViews($keyIndex, $filtered->frontmatter);
+        
+        //
+        // TODO Load content, pure or use data available
+        // own functuion
+        // perhaps load in separate view
+        //
         $content["views"]["main"]["data"]["content"] = $filtered->text;
+        $this->loadAdditionalContent($content["views"]);
 
         return (object) $content;
     }

@@ -79,7 +79,7 @@ $class .= empty($class) ? "" : "has-sidebar";
 ?>
 
         <?php if ($sidebarLeft): ?>
-        <div class="sidebar-left <?= $class ?>" role="complementary">
+        <div class="sidebar sidebar-left <?= $class ?>" role="complementary">
             <?php $this->renderRegion("sidebar-left")?>
         </div>
         <?php endif; ?>
@@ -91,7 +91,7 @@ $class .= empty($class) ? "" : "has-sidebar";
         <?php endif; ?>
 
         <?php if ($sidebarRight): ?>
-        <div class="sidebar-right <?= $class ?>" role="complementary">
+        <div class="sidebar sidebar-right <?= $class ?>" role="complementary">
             <?php $this->renderRegion("sidebar-right")?>
         </div>
         <?php endif; ?>

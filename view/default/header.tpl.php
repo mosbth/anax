@@ -9,7 +9,7 @@
 <?php if (isset($siteLogoText)) : ?>
 <span class="site-logo" >
     <a href="<?= $this->url($homeLink) ?>">
-        <span class="site-logo"><?= $siteLogoText ?></span>
+        <span class="site-logo-text"><?= $siteLogoText ?></span>
     </a>
 </span>
 <?php endif; ?>
