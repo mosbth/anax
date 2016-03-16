@@ -18,6 +18,30 @@ class CFileBasedContent
     private $index = null;
     private $meta = null;
     private $ignoreCache = false;
+    
+    /**
+     * File name pattern, all files must match this pattern and the first
+     * numbered part is optional, the second part becomes the route.
+     */
+    private $filenamePattern = "#^(\d*)_*([^\.]+)\.md$#";
+
+    /**
+     * Internal routes that is marked as internal content routes and not 
+     * exposed as public routes.
+     */
+    private $internalRouteDirPattern = [
+        "#block/#",        
+    ];
+
+    private $internalRouteFilePattern = [
+        "#^block[_-]{1}#",
+        "#^_#",
+    ];
+
+    /**
+     * Routes that should be used in toc.
+     */
+    private $allowedInTocPattern = "([\d]+_(\w)+)";
 
 
 
@@ -90,6 +114,47 @@ class CFileBasedContent
 
 
     /**
+     * Check if a filename is to be marked as an internal route..
+     *
+     * @param string $filepath as the basepath (routepart) to the file.
+     *
+     * @return boolean true if the route content is internal, else false
+     */
+    private function isInternalRoute($filepath)
+    {
+        foreach ($this->internalRouteDirPattern as $pattern) {
+            if (preg_match($pattern, $filepath)) {
+                return true;
+            }
+        }
+
+        $filename = basename($filepath);
+        foreach ($this->internalRouteFilePattern as $pattern) {
+            if (preg_match($pattern, $filename)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+
+    /**
+     * Check if filepath should be used as part of toc.
+     *
+     * @param string $filepath as the basepath (routepart) to the file.
+     *
+     * @return boolean true if the route content shoul dbe in toc, else false
+     */
+    private function allowInToc($filepath)
+    {
+        return (boolean) preg_match($this->allowedInTocPattern, $filepath);
+    }
+
+
+
+    /**
      * Generate an index from the directory structure.
      *
      * @return array as table of content.
@@ -106,13 +171,13 @@ class CFileBasedContent
 
             // Find content files
             $matches = [];
-            preg_match("#^(\d*)_*([^\.]+)\.md$#", basename($filepath), $matches);
+            preg_match($this->filenamePattern, basename($filepath), $matches);
             $dirpart = dirname($filepath) . "/";
             if ($dirpart === "./") {
                 $dirpart = null;
             }
             $key = $dirpart . $matches[2];
-
+            
             // Create level depending on the file id
             $id = $matches[1];
             $level = 2;
@@ -123,9 +188,11 @@ class CFileBasedContent
             }
 
             $index[$key] = [
-                "file"    => $filepath,
-                "section" => $matches[1],
-                "level"   => $level,
+                "file"     => $filepath,
+                "section"  => $matches[1],
+                "level"    => $level,
+                "internal" => $this->isInternalRoute($filepath),
+                "tocable"  => $this->allowInToc($filepath),
             ];
         }
 
@@ -173,6 +240,7 @@ class CFileBasedContent
         $meta = [];
         foreach (glob_recursive($path) as $file) {
             $filepath = substr($file, strlen($basepath) + 1);
+            
             $src = file_get_contents($file);
             $filtered = $this->di->textFilter->parse($src, $filter);
 
@@ -202,7 +270,7 @@ class CFileBasedContent
         $base = dirname($route);
         return isset($this->meta[$base])
             ? $this->meta[$base]
-            : null;
+            : [];
     }
 
 
@@ -239,15 +307,15 @@ class CFileBasedContent
         $toc = [];
         $len = strlen($route);
 
-echo "TOC for $route<br>";
         foreach ($this->index as $key => $value) {
             if (substr($key, 0, $len) === $route) {
-                echo "MATCH $key<br>";
-                $toc[$key] = $value;
-                $toc[$key]["title"] = $this->getTitle($value["file"]);
+                if ($value["internal"] === false
+                    && $value["tocable"] === true) {
+                    $toc[$key] = $value;
+                    $toc[$key]["title"] = $this->getTitle($value["file"]);
+                }
             }
         };
-        echo "DONE<br>";
 
         return $toc;
     }
@@ -292,7 +360,7 @@ echo "TOC for $route<br>";
 
         // From meta frontmatter
         $meta = $this->getMetaForRoute($route);
-        if ($meta && isset($meta[$key])) {
+        if (isset($meta[$key])) {
             $view = $meta[$key];
         }
 
@@ -320,10 +388,25 @@ echo "TOC for $route<br>";
      */
     private function getViews($route, $frontmatter)
     {
+        // Arrange data into views
         $views = $this->getView($route, $frontmatter, "views", false);
         $views["toc"]  = $this->getView($route, $frontmatter, "toc");
         $views["main"] = $this->getView($route, $frontmatter, "main");
 
+        // Merge remaining frontmatter into view main data.
+        unset($frontmatter["views"]);
+        unset($frontmatter["main"]);
+        unset($frontmatter["toc"]);
+        $data = $this->getMetaForRoute($route);
+        $data = array_merge_recursive_distinct($data, $frontmatter);
+        unset($data["views"]);
+        unset($data["main"]);
+        unset($data["toc"]);
+        if (isset($views["main"]["data"])) {
+            $views["main"]["data"] = array_merge_recursive_distinct($views["main"]["data"], $data);
+        }
+
+        // Get default template
         if (!isset($views["main"]["template"])) {
             $views["main"]["template"] = $this->config["template"];
         }
@@ -359,16 +442,57 @@ echo "TOC for $route<br>";
 
 
     /**
-     * Load extra info intro views based of meta information provided in each
+     * Order and limit toc items.
+     *
+     * @param string &$toc  array with current toc.
+     * @param string &$meta on how to order and limit toc.
+     *
+     * @return void.
+     */
+    private function orderAndlimitToc(&$toc, &$meta)
+    {
+        $defaults = [
+            "items" => 7,
+            "offset" => 0,
+            "orderby" => "section",
+            "orderorder" => "asc",
+        ];
+        $options = array_merge($defaults, $meta);
+        $orderby = $options["orderby"];
+        $order   = $options["orderorder"];
+
+        $meta["totalItems"] = count($toc);
+
+        // TODO support pagination by adding entries to $meta
+        
+        uksort($toc, function ($a, $b) use ($toc, $orderby, $order) {
+            $a = $toc[$a][$orderby];
+            $b = $toc[$b][$orderby];
+
+            if ($order == "asc") {
+                return strcmp($a, $b); 
+            }
+            return strcmp($b, $a); 
+        });
+
+        $toc = array_slice($toc, $options["offset"], $options["items"]);
+        $meta["displayedItems"] = count($toc);
+    }
+
+
+
+    /**
+     * Load extra info into views based of meta information provided in each
      * view.
      *
-     * @param array &$views array with all views.
+     * @param array  &$views array with all views.
+     * @param string $route  current route.
      *
      * @throws NotFoundException when mapping can not be done.
      *
      * @return void.
      */
-    private function loadAdditionalContent(&$views)
+    private function loadAdditionalContent(&$views, $route)
     {
         foreach ($views as $id => $view) {
             $meta = isset($view["data"]["meta"])
@@ -377,8 +501,11 @@ echo "TOC for $route<br>";
 
             if (is_array($meta)) {
                 switch ($meta["type"]) {
-                    case "multi":
-
+                    case "toc":
+                        $toc = $this->meta[$route]["toc"]["data"]["toc"];
+                        $this->orderAndlimitToc($toc, $meta);
+                        $views[$id]["data"]["toc"] = $toc;
+                        $views[$id]["data"]["meta"] = $meta;
                     break;
 
                     case "single":
@@ -386,7 +513,7 @@ echo "TOC for $route<br>";
                     break;
 
                     default:
-                        throw new Exception(t("Unsupported data/meta/type."));
+                        throw new Exception(t("Unsupported data/meta/type for additional content."));
                 }
             }
         }
@@ -484,7 +611,7 @@ echo "TOC for $route<br>";
         // perhaps load in separate view
         //
         $content["views"]["main"]["data"]["content"] = $filtered->text;
-        $this->loadAdditionalContent($content["views"]);
+        $this->loadAdditionalContent($content["views"], $route);
 
         return (object) $content;
     }

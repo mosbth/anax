@@ -7,7 +7,7 @@ if (isset($class)) {
 
 // Load content details from route 
 if (isset($contentRoute)) {
-    extract($this->contentForRoute($contentRoute));
+    extract($this->getContentForRoute($contentRoute));
 }
 
 // Prepare title

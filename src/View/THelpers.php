@@ -117,7 +117,7 @@ trait THelpers
      *
      * @return array with values to extract in view.
      */
-    public function contentForRoute($route)
+    public function getContentForRoute($route)
     {
         $content = $this->di->get("content")->contentForRoute($route);
         return $content->views["main"]["data"];

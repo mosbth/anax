@@ -181,7 +181,7 @@ class CDIFactoryDefault extends CDI
             return $pc;
         });
 
-        $this->set("content", function () {
+        $this->setShared("content", function () {
             $content = new \Anax\Content\CFileBasedContent();
             $content->setDI($this);
             $content->configure("content.php");
