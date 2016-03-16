@@ -107,4 +107,19 @@ trait THelpers
     {
         $this->di->get("views")->render($region);
     }
+
+
+
+    /**
+     * Load content from a route and return details to view.
+     *
+     * @param string $route to load content from.
+     *
+     * @return array with values to extract in view.
+     */
+    public function contentForRoute($route)
+    {
+        $content = $this->di->get("content")->contentForRoute($route);
+        return $content->views["main"]["data"];
+    }
 }

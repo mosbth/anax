@@ -22,9 +22,25 @@ class CFileBasedContent
 
 
     /**
+     * Set default values from configuration.
+     *
+     * @return this.
+     */
+    public function setDefaultsFromConfiguration()
+    {
+        $this->ignoreCache = isset($this->config["ignoreCache"])
+            ? $this->config["ignoreCache"]
+            : $this->ignoreCache;
+
+        return $this;
+    }
+
+
+
+    /**
      * Should the cache be used or ignored.
      *
-     * @param boolean $use true to use the cache or false to ignore the cache.
+     * @param boolean $use true to use the cache or false to ignore the cache
      *
      * @return this.
      */
@@ -83,7 +99,7 @@ class CFileBasedContent
         $basepath   = $this->config["basepath"];
         $pattern    = $this->config["pattern"];
         $path       = "$basepath/$pattern";
-        
+
         $index = [];
         foreach (glob_recursive($path) as $file) {
             $filepath = substr($file, strlen($basepath) + 1);
@@ -159,10 +175,10 @@ class CFileBasedContent
             $filepath = substr($file, strlen($basepath) + 1);
             $src = file_get_contents($file);
             $filtered = $this->di->textFilter->parse($src, $filter);
-            
-            $key = dirname($filepath); 
+
+            $key = dirname($filepath);
             $meta[$key] = $filtered->frontmatter;
-            
+
             // Add Toc to the data array
             if (isset($meta[$key]["toc"])) {
                 $meta[$key]["toc"]["data"]["toc"] = $this->createBaseRouteToc(dirname($filepath));
@@ -223,12 +239,15 @@ class CFileBasedContent
         $toc = [];
         $len = strlen($route);
 
+echo "TOC for $route<br>";
         foreach ($this->index as $key => $value) {
             if (substr($key, 0, $len) === $route) {
+                echo "MATCH $key<br>";
                 $toc[$key] = $value;
                 $toc[$key]["title"] = $this->getTitle($value["file"]);
             }
         };
+        echo "DONE<br>";
 
         return $toc;
     }
@@ -252,7 +271,7 @@ class CFileBasedContent
             return ["$route/index", $this->index["$route/index"]];
         }
 
-        throw new \Anax\Exception\NotFoundException(t("The content does not exists in the index."));
+        throw new \Anax\Exception\NotFoundException(t("The route '!ROUTE' does not exists in the index.", ["!ROUTE" => $route]));
     }
 
 
@@ -318,6 +337,31 @@ class CFileBasedContent
      * Load extra info intro views based of meta information provided in each
      * view.
      *
+     * @param string $view  with current settings.
+     * @param string $route to load view from.
+     *
+     * @return array with view details.
+     */
+    private function getAdditionalViewDataForRoute($view, $route)
+    {
+        // Get filtered content from route
+        list(, , $filtered) =
+            $this->mapRoute2Content($route);
+
+        // From document frontmatter
+        $view["data"] = array_merge_recursive_distinct($view["data"], $filtered->frontmatter);
+        $view["data"]["content"] = $filtered->text;
+
+        return $view;
+
+    }
+
+
+
+    /**
+     * Load extra info intro views based of meta information provided in each
+     * view.
+     *
      * @param array &$views array with all views.
      *
      * @throws NotFoundException when mapping can not be done.
@@ -334,22 +378,13 @@ class CFileBasedContent
             if (is_array($meta)) {
                 switch ($meta["type"]) {
                     case "multi":
-                    
-                    break;
-                    
-                    case "single":
-                        // Get filtered content from route
-                        list(, , $filtered) = 
-                            $this->mapRoute2Content($meta["route"]);
-                        
-                        // From document frontmatter
-                        $frontmatter = $filtered->frontmatter;
-                        $view["data"] = array_merge_recursive_distinct($view["data"], $frontmatter);
 
-                        $view["data"]["content"] = $filtered->text;
-                        $views[$id] = $view;
                     break;
-                    
+
+                    case "single":
+                        $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"]);
+                    break;
+
                     default:
                         throw new Exception(t("Unsupported data/meta/type."));
                 }
@@ -382,7 +417,7 @@ class CFileBasedContent
 
         // Load content from file
         if (!is_file($path)) {
-            throw new \Anax\Exception\NotFoundException(t("The content does not exists as a file."));
+            throw new \Anax\Exception\NotFoundException(t("The content '!ROUTE' does not exists as a file '!FILE'.", ["!ROUTE" => $key, "!FILE" => $path]));
         }
 
         // Get filtered content
@@ -407,7 +442,7 @@ class CFileBasedContent
         // Look it up in the index
         list($keyIndex, $content) = $this->mapRoute2Index($route);
         list($content, $filtered) = $this->loadFileContent($keyIndex, $content);
-        
+
         return [$keyIndex, $content, $filtered];
     }
 
@@ -416,11 +451,16 @@ class CFileBasedContent
     /**
      * Map url to content if such mapping can be done.
      *
+     * @param string $route optional route to look up.
+     *
+     * @return object with content and filtered version.
      */
-    public function contentForRoute()
+    public function contentForRoute($route = null)
     {
         // Get the route
-        $route = $this->di->request->getRoute();
+        if (is_null($route)) {
+            $route = $this->di->request->getRoute();
+        }
 
         // TODO cache route content.
 
@@ -431,13 +471,13 @@ class CFileBasedContent
 
         // TODO Should not supply all frontmatter to theme, only the
         // parts valid to the index template. Separate that data into own
-        // holder in frontmatter. Do not include whole frontmatter? Only 
+        // holder in frontmatter. Do not include whole frontmatter? Only
         // on debg?
         $content["frontmatter"] = $filtered->frontmatter;
 
         // Create and arrange the content as views
         $content["views"] = $this->getViews($keyIndex, $filtered->frontmatter);
-        
+
         //
         // TODO Load content, pure or use data available
         // own functuion

@@ -5,11 +5,16 @@ if (isset($class)) {
     $classes[] = $class;
 }
 
+// Load content details from route 
+if (isset($contentRoute)) {
+    extract($this->contentForRoute($contentRoute));
+}
+
 // Prepare title
 $title = isset($title) && !empty($title)? $title : null;
 $header = isset($header) ? $header : $title; 
 
-// Prepare content
+// Prepare content into text
 $content = isset($content) ? $content : null;
 $text = isset($text) ? $text : $content;
 
@@ -20,7 +25,7 @@ $text = isset($text) ? $text : $content;
     <?php endif; ?>
 
     <?php if (isset($text)) : ?>
-        <p><?= $text ?></p>
+        <?= $text ?>
     <?php endif; ?>
 
     <?php if (isset($links)) : 

@@ -185,6 +185,7 @@ class CDIFactoryDefault extends CDI
             $content = new \Anax\Content\CFileBasedContent();
             $content->setDI($this);
             $content->configure("content.php");
+            $content->setDefaultsFromConfiguration();
             return $content;
         });
 

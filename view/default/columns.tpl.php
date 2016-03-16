@@ -1,22 +1,18 @@
-<div class="<?= "$class-wrapper" ?>">
+<?php 
+// Prepare the classes and allow $column to add own $class.
+$outerClass = isset($class) ? $class : null;
+$class = null;
+
+?><div <?= $this->classList("$outerClass-wrapper") ?>>
 
 <?php $i = 1; foreach ($columns as $column) : ?>
-    <div class="<?= $class ?>">
-        <div class="<?= "$class-x $class-$i" ?>">
+    <div <?= $this->classList("$outerClass") ?>>
 
-            <h4><?= $column["header"] ?></h4>
+        <?php 
+        $column["classes"] = ["$outerClass-x", "$outerClass-$i"];
+        $this->renderView("default/block", $column);
+         ?>
 
-            <?php if (isset($column["text"])) : ?>
-                <p><?= $column["text"] ?></p>
-            <?php endif; ?>
-
-            <?php if (isset($column["links"])) : 
-                $this->renderView("default/link-list", [
-                    "links" => $column["links"]
-                ]); 
-            endif; ?>
-
-        </div>
     </div>
 <?php $i++; endforeach; ?>
 
