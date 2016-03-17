@@ -26,11 +26,11 @@ class CFileBasedContent
     private $filenamePattern = "#^(\d*)_*([^\.]+)\.md$#";
 
     /**
-     * Internal routes that is marked as internal content routes and not 
+     * Internal routes that is marked as internal content routes and not
      * exposed as public routes.
      */
     private $internalRouteDirPattern = [
-        "#block/#",        
+        "#block/#",
     ];
 
     private $internalRouteFilePattern = [
@@ -45,6 +45,110 @@ class CFileBasedContent
 
 
 
+    /**
+     * Create an array suitable for creating an breadcrumb.
+     *
+     * @return array with values for the breadcrumb.
+     */
+/*    public function createBreadcrumbForRoute() {
+
+      $breadcrumbs = array();
+      if(!empty($this['parents'])) {
+        foreach($this['parents'] as $val) {
+          $label  = empty($val['breadcrumb'])  ? $val['title'] : $val['breadcrumb'] ;
+          $breadcrumbs[] = array('label' => $label, 'url' => $val['url']);
+        }
+      }
+
+      $label  = empty($this['breadcrumb'])  ? $this['title'] : $this['breadcrumb'] ;
+      $url    = empty($this['url'])         ? $this->request->request : $this['url'];
+      $breadcrumbs[] = array('label' => $label, 'url' => $url);
+
+      uasort($breadcrumbs, function($a, $b) {
+        return strcmp($a['url'], $b['url']);
+      });
+
+      return $breadcrumbs;
+    }
+
+
+
+    /**
+     * Get content as pure text.
+     *
+     * @return string with the pure text.
+     */
+/*    public function GetPureText() {
+      return preg_replace('/\s+/', ' ', strip_tags($this->GetFilteredData()));
+    }
+*/    
+    
+
+    /**
+     * Get the TOC of headings to a certain level.
+     *
+     * @param integer $level which level of headings to use for toc.
+     * @return array with entries to generate a TOC.
+     */
+/*    public function GetTableOfContent($level=4) {
+    	$pattern = '/<(h[2-'.$level.'])([^>]*)>(.*)<\/h[2-'.$level.']>/';
+    	preg_match_all($pattern, $this->data['data_filtered'], $matches, PREG_SET_ORDER);
+      $this->data['toc'] = array();
+      $this->data['toc_formatted'] = null;
+      foreach($matches as $val) {
+        preg_match('/id=[\'"]([^>"\']+)/', $val[2], $id);
+        $id = isset($id[1]) ? $id[1] : null;
+        $this->data['toc'][] = array('level' => (isset($matches[1]) ? $matches[1] : null), 'id' => $id, 'label' => (isset($val[3]) ? $val[3] : null));
+        $a1 = $id ? "<a href='#{$id}'>" : null;
+        $a2 = $id ? "</a>" : null;
+        //$this->data['toc_formatted'] .= "<li class='{$val[1]}'>{$a1}" . htmlEnt($val[3]) . "{$a2}</li>\n";
+        $this->data['toc_formatted'] .= "<li class='{$val[1]}'>{$a1}{$val[3]}{$a2}</li>\n";
+      }
+      if($this->data['toc_formatted']) {
+        $this->data['toc_formatted'] = "<ul>\n" . $this->data['toc_formatted'] . "</ul>\n";
+      }
+      return $this->data['toc'];
+    }
+    
+    
+*/
+
+
+/**
+ * Get time when the content was last updated.
+ *
+ * @return string with the time.
+ */
+/*public function PublishTime() {
+  if(!empty($this['published'])) {
+    return $this['published'];
+  } else if(isset($this['updated'])) {
+    return $this['updated'];
+  } else {
+    return $this['created'];
+  } 
+}
+*/
+
+
+
+/**
+ * Get the action for latest updated of the content.
+ *
+ * @return string with the time.
+ */
+/*public function PublishAction() {
+  if(!empty($this['published'])) {
+    //return t('Published');
+    return t('Last updated');
+  } else if(isset($this['updated'])) {
+    return t('Updated');
+  } else {
+    return t('Created');
+  } 
+}
+
+*/
     /**
      * Set default values from configuration.
      *
@@ -611,6 +715,7 @@ class CFileBasedContent
         // perhaps load in separate view
         //
         $content["views"]["main"]["data"]["content"] = $filtered->text;
+        $content["views"]["main"]["data"]["excerpt"] = $filtered->excerpt;
         $this->loadAdditionalContent($content["views"], $route);
 
         return (object) $content;
