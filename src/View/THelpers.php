@@ -138,7 +138,7 @@ trait THelpers
      */
     public function wrapElementWithStartEnd($text, $tag, $start, $end, $count)
     {
-        return $this->di->get("testfilter")->wrapElementWithStartEnd($text, $tag, $start, $end, $count);
+        return $this->di->get("textFilter")->wrapElementWithStartEnd($text, $tag, $start, $end, $count);
     }
 
 
@@ -156,6 +156,6 @@ trait THelpers
      */
     public function wrapElementContentWithStartEnd($text, $tag, $start, $end, $count)
     {
-        return $this->di->get("testfilter")->wrapElementContentWithStartEnd($text, $tag, $start, $end, $count);
+        return $this->di->get("textFilter")->wrapElementContentWithStartEnd($text, $tag, $start, $end, $count);
     }
 }
