@@ -45,7 +45,7 @@ class CUrl
                     ? "/$this->scriptName"
                     : null);
 
-        } elseif (substr($uri, 0, 7) == "http://" 
+        } elseif (substr($uri, 0, 7) == "http://"
             || substr($uri, 0, 8) == "https://"
             || substr($uri, 0, 2) == "//"
         ) {
