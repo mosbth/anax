@@ -46,6 +46,65 @@ class CFileBasedContent
 
 
     /**
+     * Create a breadcrumb, append slash / to all dirs.
+     *
+     * @param string $route      current route.
+     *
+     * @return array with values for the breadcrumb.
+     */
+    public function createBreadcrumb($route)
+    {
+        $breadcrumbs = [];
+
+        while ($route !== "./") {
+            $routeIndex = $this->mapRoute2IndexKey($route);
+            $item["url"] = $route;
+            $item["text"] = $this->getTitle($this->index[$routeIndex]["file"]);
+            $breadcrumbs[] = $item;
+            $route = dirname($route) . "/";
+        }
+
+        krsort($breadcrumbs);
+        return $breadcrumbs;
+    }
+
+
+
+/**
+ * Get time when the content was last updated.
+ *
+ * @return string with the time.
+ */
+/*public function PublishTime() {
+  if(!empty($this['published'])) {
+    return $this['published'];
+  } else if(isset($this['updated'])) {
+    return $this['updated'];
+  } else {
+    return $this['created'];
+  } 
+}
+*/
+/**
+ * Get the action for latest updated of the content.
+ *
+ * @return string with the time.
+ */
+/*public function PublishAction() {
+  if(!empty($this['published'])) {
+    //return t('Published');
+    return t('Last updated');
+  } else if(isset($this['updated'])) {
+    return t('Updated');
+  } else {
+    return t('Created');
+  } 
+}
+*/
+
+
+
+    /**
      * Set default values from configuration.
      *
      * @return this.
@@ -248,9 +307,7 @@ class CFileBasedContent
             $meta[$key] = $filtered->frontmatter;
 
             // Add Toc to the data array
-            if (isset($meta[$key]["toc"])) {
-                $meta[$key]["toc"]["data"]["toc"] = $this->createBaseRouteToc(dirname($filepath));
-            }
+            $meta[$key]["__toc__"] = $this->createBaseRouteToc(dirname($filepath));
         }
 
         return $meta;
@@ -323,6 +380,30 @@ class CFileBasedContent
 
 
     /**
+     * Map the route to the correct key in the index.
+     *
+     * @param string $route current route used to access page.
+     *
+     * @return string as key or false if no match.
+     */
+    private function mapRoute2IndexKey($route)
+    {
+        $route = rtrim($route, "/");
+
+        if (key_exists($route, $this->index)) {
+            return $route;
+        } elseif (empty($route) && key_exists("index", $this->index)) {
+            return "index";
+        } elseif (key_exists($route . "/index", $this->index)) {
+            return "$route/index";
+        }
+
+        return false;
+    }
+
+
+
+    /**
      * Map the route to the correct entry in the index.
      *
      * @param string $route current route used to access page.
@@ -331,12 +412,10 @@ class CFileBasedContent
      */
     private function mapRoute2Index($route)
     {
-        if (key_exists($route, $this->index)) {
-            return [$route, $this->index[$route]];
-        } elseif (empty($route) && key_exists("index", $this->index)) {
-            return ["index", $this->index["index"]];
-        } elseif (key_exists($route . "/index", $this->index)) {
-            return ["$route/index", $this->index["$route/index"]];
+        $routeIndex = $this->mapRoute2IndexKey($route);
+
+        if ($routeIndex) {
+            return [$routeIndex, $this->index[$routeIndex]];
         }
 
         throw new \Anax\Exception\NotFoundException(t("The route '!ROUTE' does not exists in the index.", ["!ROUTE" => $route]));
@@ -390,26 +469,22 @@ class CFileBasedContent
     {
         // Arrange data into views
         $views = $this->getView($route, $frontmatter, "views", false);
-        $views["toc"]  = $this->getView($route, $frontmatter, "toc");
-        $views["main"] = $this->getView($route, $frontmatter, "main");
 
-        // Merge remaining frontmatter into view main data.
-        unset($frontmatter["views"]);
-        unset($frontmatter["main"]);
-        unset($frontmatter["toc"]);
-        $data = $this->getMetaForRoute($route);
-        $data = array_merge_recursive_distinct($data, $frontmatter);
-        unset($data["views"]);
-        unset($data["main"]);
-        unset($data["toc"]);
-        if (isset($views["main"]["data"])) {
-            $views["main"]["data"] = array_merge_recursive_distinct($views["main"]["data"], $data);
-        }
-
-        // Get default template
+        // Set defaults
         if (!isset($views["main"]["template"])) {
             $views["main"]["template"] = $this->config["template"];
         }
+        if (!isset($views["main"]["data"])) {
+            $views["main"]["data"] = [];
+        }
+
+        // Merge remaining frontmatter into view main data.
+        $data = $this->getMetaForRoute($route);
+        unset($data["__toc__"]);
+        unset($data["views"]);
+        unset($frontmatter["views"]);
+        $data = array_merge_recursive_distinct($data, $frontmatter);
+        $views["main"]["data"] = array_merge_recursive_distinct($views["main"]["data"], $data);
 
         return $views;
     }
@@ -464,7 +539,7 @@ class CFileBasedContent
         $meta["totalItems"] = count($toc);
 
         // TODO support pagination by adding entries to $meta
-        
+
         uksort($toc, function ($a, $b) use ($toc, $orderby, $order) {
             $a = $toc[$a][$orderby];
             $b = $toc[$b][$orderby];
@@ -485,14 +560,15 @@ class CFileBasedContent
      * Load extra info into views based of meta information provided in each
      * view.
      *
-     * @param array  &$views array with all views.
-     * @param string $route  current route.
+     * @param array  &$views     with all views.
+     * @param string $route      current route
+     * @param string $routeIndex route with appended /index
      *
      * @throws NotFoundException when mapping can not be done.
      *
      * @return void.
      */
-    private function loadAdditionalContent(&$views, $route)
+    private function loadAdditionalContent(&$views, $route, $routeIndex)
     {
         foreach ($views as $id => $view) {
             $meta = isset($view["data"]["meta"])
@@ -502,10 +578,20 @@ class CFileBasedContent
             if (is_array($meta)) {
                 switch ($meta["type"]) {
                     case "toc":
-                        $toc = $this->meta[$route]["toc"]["data"]["toc"];
+                        $baseRoute = dirname($routeIndex);
+                        $toc = $this->meta[$baseRoute]["__toc__"];
                         $this->orderAndlimitToc($toc, $meta);
                         $views[$id]["data"]["toc"] = $toc;
                         $views[$id]["data"]["meta"] = $meta;
+                    break;
+
+                    case "breadcrumb":
+                        $views[$id]["data"]["breadcrumb"] = $this->createBreadcrumb($route);
+                    break;
+
+                    case "article-toc":
+                        $content = $views["main"]["data"]["content"];
+                        $views[$id]["data"]["articleToc"] = $this->di->get("textFilter")->createToc($content);
                     break;
 
                     case "single":
@@ -576,13 +662,32 @@ class CFileBasedContent
 
 
     /**
-     * Map url to content if such mapping can be done.
+     * Map url to content if such mapping can be done, exclude internal routes.
      *
      * @param string $route optional route to look up.
      *
      * @return object with content and filtered version.
      */
     public function contentForRoute($route = null)
+    {
+        $content = $this->contentForInternalRoute($route);
+        if ($content->internal === true) {
+            throw new \Anax\Exception\NotFoundException(t("The content '!ROUTE' does not exists as a public route.", ["!ROUTE" => $key]));
+        }
+
+        return $content;
+    }
+
+
+
+    /**
+     * Map url to content, even internal content, if such mapping can be done.
+     *
+     * @param string $route optional route to look up.
+     *
+     * @return object with content and filtered version.
+     */
+    public function contentForInternalRoute($route = null)
     {
         // Get the route
         if (is_null($route)) {
@@ -594,7 +699,7 @@ class CFileBasedContent
         // Load index and map route to content
         $this->loadIndex();
         $this->loadMetaIndex();
-        list($keyIndex, $content, $filtered) = $this->mapRoute2Content($route);
+        list($routeIndex, $content, $filtered) = $this->mapRoute2Content($route);
 
         // TODO Should not supply all frontmatter to theme, only the
         // parts valid to the index template. Separate that data into own
@@ -603,7 +708,7 @@ class CFileBasedContent
         $content["frontmatter"] = $filtered->frontmatter;
 
         // Create and arrange the content as views
-        $content["views"] = $this->getViews($keyIndex, $filtered->frontmatter);
+        $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
 
         //
         // TODO Load content, pure or use data available
@@ -611,7 +716,8 @@ class CFileBasedContent
         // perhaps load in separate view
         //
         $content["views"]["main"]["data"]["content"] = $filtered->text;
-        $this->loadAdditionalContent($content["views"], $route);
+        $content["views"]["main"]["data"]["excerpt"] = $filtered->excerpt;
+        $this->loadAdditionalContent($content["views"], $route, $routeIndex);
 
         return (object) $content;
     }

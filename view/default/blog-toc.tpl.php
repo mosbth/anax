@@ -1,6 +1,6 @@
 <?php 
 // Prepare classes
-$classes[] = "block toc";
+$classes[] = "block blog-toc";
 if (isset($class)) {
     $classes[] = $class;
 }
@@ -8,8 +8,7 @@ if (isset($class)) {
 // Prepare title
 $title = isset($title) && !empty($title)
     ? $title
-    : t("Table Of Content");
-
+    : t("Current posts");
 
 
 ?><div <?= $this->classList($classes) ?>>
@@ -18,8 +17,12 @@ $title = isset($title) && !empty($title)
     
     <ul class="toc">
         <?php foreach ($toc as $route => $item) : ?>
-        <li class="level-<?= $item["level"] ?>"><a href="<?= $this->url($route) ?>"><?= $item["title"] ?></a></li>
+        <li><a href="<?= $this->url($route) ?>"><?= $item["title"] ?></a></li>
         <?php endforeach; ?>
     </ul>
+
+    <footer>
+        <p>Displaying <?= $meta["displayedItems"] ?> out of <?= $meta["totalItems"] ?>.</p>
+    </footer>
 
 </div>

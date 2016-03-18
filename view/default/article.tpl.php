@@ -1,6 +1,10 @@
 <?php 
-$class = isset($class) ? $class : null;
+// Prepare classes
+$classes[] = "article";
+if (isset($class)) {
+    $classes[] = $class;
+}
 
-?><article <?= $this->classList($class) ?>>
-<?=$content?>
+?><article <?= $this->classList($classes) ?>>
+<?= $content ?>
 </article>

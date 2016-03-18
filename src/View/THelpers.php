@@ -119,7 +119,43 @@ trait THelpers
      */
     public function getContentForRoute($route)
     {
-        $content = $this->di->get("content")->contentForRoute($route);
+        $content = $this->di->get("content")->contentForInternalRoute($route);
         return $content->views["main"]["data"];
+    }
+
+
+
+    /**
+     * Wrap a HTML element with start and end.
+     *
+     * @param string  $text  with content
+     * @param string  $tag   HTML tag to search for
+     * @param string  $start wrap start part
+     * @param string  $end   wrap end part
+     * @param number  $count hits to search for
+     *
+     * @return array with values to extract in view.
+     */
+    public function wrapElementWithStartEnd($text, $tag, $start, $end, $count)
+    {
+        return $this->di->get("testfilter")->wrapElementWithStartEnd($text, $tag, $start, $end, $count);
+    }
+
+
+
+    /**
+     * Wrap content of a HTML element with start and end.
+     *
+     * @param string  $text  with content
+     * @param string  $tag   HTML tag to search for
+     * @param string  $start wrap start part
+     * @param string  $end   wrap end part
+     * @param number  $count hits to search for
+     *
+     * @return array with values to extract in view.
+     */
+    public function wrapElementContentWithStartEnd($text, $tag, $start, $end, $count)
+    {
+        return $this->di->get("testfilter")->wrapElementContentWithStartEnd($text, $tag, $start, $end, $count);
     }
 }

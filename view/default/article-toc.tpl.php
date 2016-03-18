@@ -17,8 +17,8 @@ $title = isset($title) && !empty($title)
     <h4><?= $title ?></h4>
     
     <ul class="toc">
-        <?php foreach ($toc as $route => $item) : ?>
-        <li class="level-<?= $item["level"] ?>"><a href="<?= $this->url($route) ?>"><?= $item["title"] ?></a></li>
+        <?php foreach ($articleToc as $item) : ?>
+        <li class="level-<?= $item["level"] ?>"><a href="#<?= $item["id"] ?>"><?= $item["title"] ?></a></li>
         <?php endforeach; ?>
     </ul>
 
