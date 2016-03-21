@@ -13,8 +13,24 @@ $categoryLabel = isset($label["category"])
 // Defaults
 $category = isset($category) ? $category : null;
 
+// Add meta header to h1
+$byStr = t("By");
+$pubStr = t("Published");
+$header = <<<EOD
+<header>
+    <h1\$1>\$2</h1>
+    <p class="meta-header">
+    <adress class="author">$byStr <a rel="author" href="/author/">$author</a>.</adress>
+    $pubStr <time pubdate datetime="$published">$published</time>
+    </p>
+</header>
+EOD;
 
-?><article <?= $this->classList($classes) ?>>
+$content = preg_replace("#<h1(.*?)>(.*?)</h1>#", $header, $content, 1);
+
+
+
+?><article <?= $this->classList($classes) ?> itemscope itemtype="http://schema.org/Article">
 
     <?= $content ?>
 
