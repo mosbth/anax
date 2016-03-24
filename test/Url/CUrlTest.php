@@ -31,6 +31,11 @@ class CUrlTest extends \PHPUnit_Framework_TestCase
                 "//dbwebb.se",
                 "//dbwebb.se",
             ],
+            [
+                "https://dbwebb.se",
+                "https://dbwebb.se",
+                "https://dbwebb.se",
+            ],
         ];
     }
 

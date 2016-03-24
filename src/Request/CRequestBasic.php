@@ -223,7 +223,7 @@ class CRequestBasic
         }
 
         $url  = $rs ? $rs : 'http';
-        $url .= $https ? 's' : '';
+        //$url .= $https ? 's' : '';
         $url .= '://';
         $url .= $sn . $port . htmlspecialchars($ru);
         
