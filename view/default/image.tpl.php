@@ -1,1 +1,1 @@
-<img class="<?= $class ?>" src="<?= $src ?>" alt="<?= $alt ?>">
+<img class="<?= $class ?>" src="<?= $this->asset($src) ?>" alt="<?= $alt ?>">

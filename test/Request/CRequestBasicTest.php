@@ -160,7 +160,7 @@ class CRequestBasicTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'REQUEST_SCHEME' => "http",
+                    'REQUEST_SCHEME' => "https",
                     'HTTPS'       => "on", //"on",
                     'SERVER_NAME' => "dbwebb.se",
                     'SERVER_PORT' => "443",
@@ -170,7 +170,7 @@ class CRequestBasicTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'REQUEST_SCHEME' => "http",
+                    'REQUEST_SCHEME' => "https",
                     'HTTPS'       => "on", //"on",
                     'SERVER_NAME' => "dbwebb.se",
                     'SERVER_PORT' => "8080",
@@ -244,7 +244,7 @@ class CRequestBasicTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'REQUEST_SCHEME' => "http",
+                    'REQUEST_SCHEME' => "https",
                     'HTTPS'       => "on",
                     'SERVER_NAME' => "dbwebb.se",
                     'SERVER_PORT' => "8080",
@@ -256,7 +256,7 @@ class CRequestBasicTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 [
-                    'REQUEST_SCHEME' => "http",
+                    'REQUEST_SCHEME' => "https",
                     'HTTPS'       => "on",
                     'SERVER_NAME' => "dbwebb.se",
                     'SERVER_PORT' => "443",

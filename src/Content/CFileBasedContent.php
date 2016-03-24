@@ -26,11 +26,11 @@ class CFileBasedContent
     private $filenamePattern = "#^(\d*)_*([^\.]+)\.md$#";
 
     /**
-     * Internal routes that is marked as internal content routes and not 
+     * Internal routes that is marked as internal content routes and not
      * exposed as public routes.
      */
     private $internalRouteDirPattern = [
-        "#block/#",        
+        "#block/#",
     ];
 
     private $internalRouteFilePattern = [
@@ -545,9 +545,9 @@ class CFileBasedContent
             $b = $toc[$b][$orderby];
 
             if ($order == "asc") {
-                return strcmp($a, $b); 
+                return strcmp($a, $b);
             }
-            return strcmp($b, $a); 
+            return strcmp($b, $a);
         });
 
         $toc = array_slice($toc, $options["offset"], $options["items"]);
@@ -583,20 +583,20 @@ class CFileBasedContent
                         $this->orderAndlimitToc($toc, $meta);
                         $views[$id]["data"]["toc"] = $toc;
                         $views[$id]["data"]["meta"] = $meta;
-                    break;
+                        break;
 
                     case "breadcrumb":
                         $views[$id]["data"]["breadcrumb"] = $this->createBreadcrumb($route);
-                    break;
+                        break;
 
                     case "article-toc":
                         $content = $views["main"]["data"]["content"];
                         $views[$id]["data"]["articleToc"] = $this->di->textFilter->createToc($content);
-                    break;
+                        break;
 
                     case "single":
                         $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"]);
-                    break;
+                        break;
 
                     default:
                         throw new Exception(t("Unsupported data/meta/type for additional content."));
