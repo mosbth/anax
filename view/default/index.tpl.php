@@ -4,6 +4,7 @@
 
     <meta charset="<?= $charset ?>">
     <title><?= $title . $title_append ?></title>
+    <base href="<?= $this->url() ?>">
 
     <?php if (isset($favicon)) : ?>
     <link rel="icon" href="<?= $this->asset($favicon) ?>">
