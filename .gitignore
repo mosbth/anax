@@ -1,4 +1,4 @@
 composer.lock
-vendor
-build
-app/cache
+vendor/
+build/
+app/cache/

@@ -5,6 +5,7 @@
     <meta charset="<?= $charset ?>">
     <title><?= $title . $title_append ?></title>
     <base href="<?= $this->url() ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <?php if (isset($favicon)) : ?>
     <link rel="icon" href="<?= $this->asset($favicon) ?>">
