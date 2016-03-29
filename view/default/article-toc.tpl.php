@@ -1,4 +1,8 @@
-<?php 
+<?php
+if (empty($toc)) {
+    return;
+}
+
 // Prepare classes
 $classes[] = "block toc";
 if (isset($class)) {

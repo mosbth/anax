@@ -1,4 +1,4 @@
-<?php 
+<?php
 // Prepare classes
 $classes[] = "block blog-toc";
 if (isset($class)) {
