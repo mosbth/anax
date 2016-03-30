@@ -1,4 +1,4 @@
-<?php 
+<?php
 // Prepare classes
 $classes[] = "article";
 if (isset($class)) {

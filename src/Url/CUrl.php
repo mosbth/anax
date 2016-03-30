@@ -59,6 +59,10 @@ class CUrl
         }
 
         $uri = rtrim($uri, '/');
+        if (basename($uri) == "index") {
+            $uri = dirname($uri);
+        }
+
         if ($this->urlType == self::URL_CLEAN) {
             return $this->baseUrl . '/' . $uri;
         } else {

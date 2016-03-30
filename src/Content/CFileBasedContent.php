@@ -216,7 +216,7 @@ class CFileBasedContent
     /**
      * Generate an index from the directory structure.
      *
-     * @return array as table of content.
+     * @return array as index for all content files.
      */
     private function createIndex()
     {
@@ -335,6 +335,8 @@ class CFileBasedContent
     /**
      * Get the title of a document.
      *
+     * @deprecated in favor of getFrontmatter
+     *
      * @param string $file to get title from.
      *
      * @return string as the title.
@@ -348,6 +350,26 @@ class CFileBasedContent
         $src = file_get_contents($path);
         $filtered = $this->di->textFilter->parse($src, $filter);
         return $filtered->frontmatter["title"];
+    }
+
+
+
+    /**
+     * Get the frontmatter of a document.
+     *
+     * @param string $file to get frontmatter from.
+     *
+     * @return array as frontmatter.
+     */
+    private function getFrontmatter($file)
+    {
+        $basepath = $this->config["basepath"];
+        $filter   = $this->config["textfilter"];
+
+        $path = $basepath . "/" . $file;
+        $src = file_get_contents($path);
+        $filtered = $this->di->textFilter->parse($src, $filter);
+        return $filtered->frontmatter;
     }
 
 
@@ -369,7 +391,11 @@ class CFileBasedContent
                 if ($value["internal"] === false
                     && $value["tocable"] === true) {
                     $toc[$key] = $value;
-                    $toc[$key]["title"] = $this->getTitle($value["file"]);
+                    
+                    $frontm = $this->getFrontmatter($value["file"]);
+                    $toc[$key]["title"] = $frontm["title"];
+                    $toc[$key]["sectionHeader"] = isset($frontm["sectionHeader"]) ? $frontm["sectionHeader"] : null;
+                    $toc[$key]["linkable"] = isset($frontm["linkable"]) ? $frontm["linkable"] : null;
                 }
             }
         };
@@ -557,6 +583,60 @@ class CFileBasedContent
 
 
     /**
+     * Find next and previous links of current content.
+     *
+     * @param string $routeIndex target route to find next and previous for.
+     *
+     * @return array with next and previous if found.
+     */
+    private function findNextAndPrevious($routeIndex)
+    {
+        $key = dirname($routeIndex);
+        if (!isset($this->meta[$key]["__toc__"])) {
+            return [null, null];
+        }
+
+        $toc = $this->meta[$key]["__toc__"];
+        if (!isset($toc[$routeIndex])) {
+            return [null, null];
+        }
+
+        $index2Key = array_keys($toc);
+        $keys = array_flip($index2Key);
+        $values = array_values($toc);
+        $count = count($keys);
+
+        $current = $keys[$routeIndex];
+        $previous = null;
+        for ($i = $current - 1; $i >= 0; $i--) {
+            $isSectionHeader = $values[$i]["sectionHeader"];
+            $isInternal = $values[$i]["internal"];
+            if ($isSectionHeader || $isInternal) {
+                continue;
+            }
+            $previous = $values[$i];
+            $previous["route"] = $index2Key[$i];
+            break;
+        }
+        
+        $next = null;
+        for ($i = $current + 1; $i < $count; $i++) {
+            $isSectionHeader = $values[$i]["sectionHeader"];
+            $isInternal = $values[$i]["internal"];
+            if ($isSectionHeader || $isInternal) {
+                continue;
+            }
+            $next = $values[$i];
+            $next["route"] = $index2Key[$i];
+            break;
+        }
+
+        return [$next, $previous];
+    }
+
+
+
+    /**
      * Load extra info into views based of meta information provided in each
      * view.
      *
@@ -577,25 +657,32 @@ class CFileBasedContent
 
             if (is_array($meta)) {
                 switch ($meta["type"]) {
-                    case "toc":
-                        $baseRoute = dirname($routeIndex);
-                        $toc = $this->meta[$baseRoute]["__toc__"];
-                        $this->orderAndlimitToc($toc, $meta);
-                        $views[$id]["data"]["toc"] = $toc;
-                        $views[$id]["data"]["meta"] = $meta;
+                    case "article-toc":
+                        $content = $views["main"]["data"]["content"];
+                        $views[$id]["data"]["articleToc"] = $this->di->textFilter->createToc($content);
                         break;
 
                     case "breadcrumb":
                         $views[$id]["data"]["breadcrumb"] = $this->createBreadcrumb($route);
                         break;
 
-                    case "article-toc":
-                        $content = $views["main"]["data"]["content"];
-                        $views[$id]["data"]["articleToc"] = $this->di->textFilter->createToc($content);
+                    case "next-previous":
+                        $baseRoute = dirname($routeIndex);
+                        list($next, $previous) = $this->findNextAndPrevious($routeIndex);
+                        $views[$id]["data"]["next"] = $next;
+                        $views[$id]["data"]["previous"] = $previous;
                         break;
 
                     case "single":
                         $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"]);
+                        break;
+
+                    case "toc":
+                        $baseRoute = dirname($routeIndex);
+                        $toc = $this->meta[$baseRoute]["__toc__"];
+                        $this->orderAndlimitToc($toc, $meta);
+                        $views[$id]["data"]["toc"] = $toc;
+                        $views[$id]["data"]["meta"] = $meta;
                         break;
 
                     default:
@@ -630,7 +717,8 @@ class CFileBasedContent
 
         // Load content from file
         if (!is_file($path)) {
-            throw new \Anax\Exception\NotFoundException(t("The content '!ROUTE' does not exists as a file '!FILE'.", ["!ROUTE" => $key, "!FILE" => $path]));
+            $msg = t("The content '!ROUTE' does not exists as a file '!FILE'.", ["!ROUTE" => $key, "!FILE" => $path]);
+            throw new \Anax\Exception\NotFoundException($msg);
         }
 
         // Get filtered content
@@ -672,7 +760,8 @@ class CFileBasedContent
     {
         $content = $this->contentForInternalRoute($route);
         if ($content->internal === true) {
-            throw new \Anax\Exception\NotFoundException(t("The content '!ROUTE' does not exists as a public route.", ["!ROUTE" => $key]));
+            $msg = t("The content '!ROUTE' does not exists as a public route.", ["!ROUTE" => $route]);
+            throw new \Anax\Exception\NotFoundException($msg);
         }
 
         return $content;

@@ -1,4 +1,4 @@
-<?php 
+<?php
 // Prepare classes
 $classes[] = "block toc";
 if (isset($class)) {
@@ -17,9 +17,22 @@ $title = isset($title) && !empty($title)
     <h4><?= $title ?></h4>
     
     <ul class="toc">
-        <?php foreach ($toc as $route => $item) : ?>
-        <li class="level-<?= $item["level"] ?>"><a href="<?= $this->url($route) ?>"><?= $item["title"] ?></a></li>
-        <?php endforeach; ?>
+
+        <?php
+        foreach ($toc as $route => $item) {
+            $text = $item["title"];
+            if ($item["linkable"] !== false) {
+                $text = "<a href=\"" . $this->url($route) . "\">$text</a>";
+            }
+            
+            $class = "level-${item["level"]}";
+            if ($item["sectionHeader"] === true) {
+                $class = "section-header";
+            }
+            
+            ?><li class="<?= $class ?>"><?= $text ?></li><?php
+        } ?>
+
     </ul>
 
 </div>
