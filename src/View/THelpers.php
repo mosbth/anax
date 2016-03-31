@@ -83,6 +83,18 @@ trait THelpers
 
 
     /**
+     * Get current url, without querystring.
+     *
+     * @return string as resulting url.
+     */
+    public function currentUrl()
+    {
+        return $this->di->get("request")->getCurrentUrl(false);
+    }
+
+
+
+    /**
      * Check if the region in the view container has views to render.
      *
      * @param string $region to check

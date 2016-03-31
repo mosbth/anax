@@ -44,7 +44,7 @@ class CNavbar
         ) use (
             &$createMenu,
             $menu
-) {
+        ) {
 
             $html = null;
             $hasItemIsSelected = false;
@@ -68,9 +68,9 @@ class CNavbar
 
                 // Check if the menuitem is a parent of current page, /controller for /controller/action
                 $isParent = null;
-                if (isset($item['mark-if-parent-of']) && $item['mark-if-parent-of'] == true) {
-                    $isParent = $menu['is_parent']($item['mark-if-parent-of'])
-                        ? "is-parent "
+                if (isset($item['mark-if-parent']) && $item['mark-if-parent'] == true) {
+                    $isParent = $menu['is_parent']($item['url'])
+                        ? "selected-parent "
                         : null;
                 }
 

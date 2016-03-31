@@ -301,7 +301,7 @@ class CFileBasedContent
             $filepath = substr($file, strlen($basepath) + 1);
             
             $src = file_get_contents($file);
-            $filtered = $this->di->textFilter->parse($src, $filter);
+            $filtered = $this->di->get("textFilter")->parse($src, $filter);
 
             $key = dirname($filepath);
             $meta[$key] = $filtered->frontmatter;
@@ -695,6 +695,35 @@ class CFileBasedContent
 
 
     /**
+     * Parse text, find and update all a href to use baseurl.
+     *
+     * @param object &$filtered with text and excerpt to process.
+     * @param array  $views     data for all views.
+     *
+     * @return void.
+     */
+    private function addBaseurl2AnchorUrls(&$filtered, $views)
+    {
+        $textf  = $this->di->get("textFilter");
+        $url    = $this->di->get("url");
+        $baseurl = isset($views["main"]["data"]["baseurl"])
+            ? $views["main"]["data"]["baseurl"]
+            : null;
+
+        // Use callback to url->create() instead of string concat
+        $callback = function ($route) use ($url) {
+            return $url->create($route);
+        };
+
+        $filtered->text =
+            $textf->addBaseurlToRelativeLinks($filtered->text, $baseurl, $callback);
+        $filtered->excerpt =
+            $textf->addBaseurlToRelativeLinks($filtered->excerpt, $baseurl, $callback);
+    }
+
+
+
+    /**
      * Load extra info intro views based of meta information provided in each
      * view.
      *
@@ -723,7 +752,7 @@ class CFileBasedContent
 
         // Get filtered content
         $src = file_get_contents($path);
-        $filtered = $this->di->textFilter->parse($src, $filter);
+        $filtered = $this->di->get("textFilter")->parse($src, $filter);
 
         return [$content, $filtered];
     }
@@ -796,12 +825,16 @@ class CFileBasedContent
         // on debg?
         $content["frontmatter"] = $filtered->frontmatter;
 
-        // Create and arrange the content as views
+        // Create and arrange the content as views, merge with .meta,
+        // frontmatter is complete.
         $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
+
+        // Update all anchor urls to use baseurl
+        $this->addBaseurl2AnchorUrls($filtered, $content["views"]);
 
         //
         // TODO Load content, pure or use data available
-        // own functuion
+        // own function
         // perhaps load in separate view
         //
         $content["views"]["main"]["data"]["content"] = $filtered->text;

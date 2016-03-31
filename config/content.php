@@ -19,7 +19,8 @@ return [
         "yamlfrontmatter",
         "shortcode",
         "markdown",
-        "titlefromh1"
+        "titlefromh1",
+        "anchor4Header",
     ],
 
     "metafilter" => [

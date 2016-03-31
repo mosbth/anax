@@ -31,14 +31,16 @@ class CUrl
     /**
      * Create an url and prepending the baseUrl.
      *
-     * @param string $uri part of uri to use when creating an url. "" or null
-     *                    means baseurl to current frontcontroller.
+     * @param string $uri     part of uri to use when creating an url.
+     *                        "" or null means baseurl to current
+     *                        frontcontroller.
+     * @param string $baseuri optional base to prepend uri.
      *
      * @return string as resulting url.
      */
-    public function create($uri = null)
+    public function create($uri = null, $baseuri = null)
     {
-        if (empty($uri)) {
+        if (empty($uri) && empty($baseuri)) {
             // Empty uri means baseurl
             return $this->baseUrl
                 . (($this->urlType == self::URL_APPEND)
@@ -50,23 +52,35 @@ class CUrl
             || substr($uri, 0, 2) == "//"
         ) {
             // Fully qualified, just leave as is.
-            return rtrim($uri, '/');
+            return rtrim($uri, "/");
 
-        } elseif ($uri[0] == '/') {
+        } elseif ($uri[0] == "/") {
             // Absolute url, prepend with siteUrl
             return rtrim($this->siteUrl . rtrim($uri, '/'), '/');
 
+        } elseif ($uri[0] == "#"
+            || $uri[0] == "?"
+        ) {
+            // Hashtag url to local page, or query part, leave as is.
+            return $uri;
+
         }
 
-        $uri = rtrim($uri, '/');
+        // Prepend uri with baseuri
+        $uri = rtrim($uri, "/");
+        if (!empty($baseuri)) {
+            $uri = rtrim($baseuri, "/") . "/$uri";
+        }
+
+        // Remove the trailing index part of the url
         if (basename($uri) == "index") {
             $uri = dirname($uri);
         }
 
         if ($this->urlType == self::URL_CLEAN) {
-            return $this->baseUrl . '/' . $uri;
+            return $this->baseUrl . "/" . $uri;
         } else {
-            return $this->baseUrl . '/' . $this->scriptName . '/' . $uri;
+            return $this->baseUrl . "/" . $this->scriptName . "/" . $uri;
         }
     }
 

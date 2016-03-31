@@ -10,6 +10,8 @@ $title = isset($title) && !empty($title)
     ? $title
     : t("Table Of Content");
 
+$currentUrl = $this->currentUrl();
+
 
 
 ?><div <?= $this->classList($classes) ?>>
@@ -28,6 +30,10 @@ $title = isset($title) && !empty($title)
             $class = "level-${item["level"]}";
             if ($item["sectionHeader"] === true) {
                 $class = "section-header";
+            }
+
+            if (strcmp($this->url($route), $currentUrl) === 0) {
+                $class .= " selected";
             }
             
             ?><li class="<?= $class ?>"><?= $text ?></li><?php
