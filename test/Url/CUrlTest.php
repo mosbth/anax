@@ -98,6 +98,22 @@ class CUrlTest extends \PHPUnit_Framework_TestCase
                 $baseUrl,
                 $scriptName,
                 $urlType,
+                "?",
+                "?",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $scriptName,
+                $urlType,
+                "#",
+                "#",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $scriptName,
+                $urlType,
                 "/someother/path",
                 "$siteUrl/someother/path",
             ],
@@ -199,6 +215,20 @@ class CUrlTest extends \PHPUnit_Framework_TestCase
                 $siteUrl,
                 $baseUrl,
                 $urlType,
+                "?",
+                "?",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "#",
+                "#",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
                 "/someother/path",
                 "$siteUrl/someother/path",
             ],
@@ -258,6 +288,124 @@ class CUrlTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(get_class($url), $res, "setUrlType did not return this.");
 
         $res = $url->create($route);
+        $this->assertEquals($result, $res, "Created url did not match expected.");
+    }
+
+
+
+    /**
+     * Provider for routes
+     *
+     * @return array
+     */
+    public function providerRoute3()
+    {
+        $siteUrl = "http://dbwebb.se";
+        $baseUrl = $siteUrl . "/kod-exempel/anax-mvc";
+        $urlType = \Anax\Url\CUrl::URL_CLEAN;
+        $extraUrl = "doc";
+
+        return [
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "",
+                $extraUrl,
+                "$baseUrl/$extraUrl",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "/",
+                $extraUrl,
+                "$siteUrl",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "?",
+                $extraUrl,
+                "?",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "#",
+                $extraUrl,
+                "#",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "/someother/path",
+                $extraUrl,
+                "$siteUrl/someother/path",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "controller",
+                $extraUrl,
+                "$baseUrl/$extraUrl/controller",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "controller/action",
+                $extraUrl,
+                "$baseUrl/$extraUrl/controller/action",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "controller/action/arg1",
+                $extraUrl,
+                "$baseUrl/$extraUrl/controller/action/arg1",
+            ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $urlType,
+                "controller/action/arg1/arg2",
+                $extraUrl,
+                "$baseUrl/$extraUrl/controller/action/arg1/arg2",
+            ],
+        ];
+    }
+
+
+
+    /**
+     * Test
+     *
+     *
+     * @return void
+     *
+     * @dataProvider providerRoute3
+     *
+     */
+    public function testCreateUrlAppend3($siteUrl, $baseUrl, $urlType, $route, $extraUrl, $result)
+    {
+        $url = new \Anax\Url\CUrl();
+
+        $res = $url->setSiteUrl($siteUrl);
+        $this->assertInstanceOf(get_class($url), $res, "setSiteUrl did not return this.");
+
+        $res = $url->setBaseUrl($baseUrl);
+        $this->assertInstanceOf(get_class($url), $res, "setBaseUrl did not return this.");
+
+        $res = $url->setUrlType($urlType);
+        $this->assertInstanceOf(get_class($url), $res, "setUrlType did not return this.");
+
+        $res = $url->create($route, $extraUrl);
         $this->assertEquals($result, $res, "Created url did not match expected.");
     }
 

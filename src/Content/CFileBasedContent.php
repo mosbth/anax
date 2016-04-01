@@ -59,7 +59,7 @@ class CFileBasedContent
         while ($route !== "./") {
             $routeIndex = $this->mapRoute2IndexKey($route);
             $item["url"] = $route;
-            $item["text"] = $this->getTitle($this->index[$routeIndex]["file"]);
+            $item["text"] = $this->getBreadcrumbTitle($this->index[$routeIndex]["file"]);
             $breadcrumbs[] = $item;
             $route = dirname($route) . "/";
         }
@@ -333,28 +333,6 @@ class CFileBasedContent
 
 
     /**
-     * Get the title of a document.
-     *
-     * @deprecated in favor of getFrontmatter
-     *
-     * @param string $file to get title from.
-     *
-     * @return string as the title.
-     */
-    private function getTitle($file)
-    {
-        $basepath = $this->config["basepath"];
-        $filter   = $this->config["textfilter"];
-
-        $path = $basepath . "/" . $file;
-        $src = file_get_contents($path);
-        $filtered = $this->di->textFilter->parse($src, $filter);
-        return $filtered->frontmatter["title"];
-    }
-
-
-
-    /**
      * Get the frontmatter of a document.
      *
      * @param string $file to get frontmatter from.
@@ -370,6 +348,44 @@ class CFileBasedContent
         $src = file_get_contents($path);
         $filtered = $this->di->textFilter->parse($src, $filter);
         return $filtered->frontmatter;
+    }
+
+
+
+    /**
+     * Get the title of a document.
+     *
+     * @deprecated in favor of getFrontmatter
+     *
+     * @param string $file to get title from.
+     *
+     * @return string as the title.
+     */
+    private function getTitle($file)
+    {
+        $frontmatter = $this->getFrontmatter($file);
+        return $frontmatter["title"];
+    }
+
+
+
+    /**
+     * Get the title of a document to use for breadcrumb.
+     *
+     * @param string $file to get title from.
+     *
+     * @return string as the breadcrumb title.
+     */
+    private function getBreadcrumbTitle($file)
+    {
+        $frontmatter = $this->getFrontmatter($file);
+
+        $title = $frontmatter["title"];
+        if (isset($frontmatter["titleBreadcrumb"])) {
+            $title = $frontmatter["titleBreadcrumb"];
+        }
+
+        return $title;
     }
 
 
@@ -711,14 +727,12 @@ class CFileBasedContent
             : null;
 
         // Use callback to url->create() instead of string concat
-        $callback = function ($route) use ($url) {
-            return $url->create($route);
+        $callback = function ($route) use ($url, $baseurl) {
+            return $url->create($route, $baseurl);
         };
 
         $filtered->text =
             $textf->addBaseurlToRelativeLinks($filtered->text, $baseurl, $callback);
-        $filtered->excerpt =
-            $textf->addBaseurlToRelativeLinks($filtered->excerpt, $baseurl, $callback);
     }
 
 
@@ -809,7 +823,7 @@ class CFileBasedContent
     {
         // Get the route
         if (is_null($route)) {
-            $route = $this->di->request->getRoute();
+            $route = $this->di->get("request")->getRoute();
         }
 
         // TODO cache route content.
@@ -831,6 +845,9 @@ class CFileBasedContent
 
         // Update all anchor urls to use baseurl
         $this->addBaseurl2AnchorUrls($filtered, $content["views"]);
+
+        // Add excerpt and hasMore, if available
+        $this->di->get("textFilter")->addExcerpt($filtered);
 
         //
         // TODO Load content, pure or use data available

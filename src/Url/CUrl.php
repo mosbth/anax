@@ -47,6 +47,10 @@ class CUrl
                     ? "/$this->scriptName"
                     : null);
 
+        } elseif (empty($uri)) {
+            // Empty uri means baseurl with appended $baseuri
+            ;
+
         } elseif (substr($uri, 0, 7) == "http://"
             || substr($uri, 0, 8) == "https://"
             || substr($uri, 0, 2) == "//"
@@ -78,9 +82,9 @@ class CUrl
         }
 
         if ($this->urlType == self::URL_CLEAN) {
-            return $this->baseUrl . "/" . $uri;
+            return rtrim($this->baseUrl . "/" . $uri, "/");
         } else {
-            return $this->baseUrl . "/" . $this->scriptName . "/" . $uri;
+            return rtrim($this->baseUrl . "/" . $this->scriptName . "/" . $uri, "/");
         }
     }
 
