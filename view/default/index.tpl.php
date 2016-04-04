@@ -66,6 +66,17 @@
 
 
 
+<!-- flash -->
+<?php if ($this->regionHasContent("flash")) : ?>
+<div class="outer-wrap-flash">
+    <div class="inner-wrap-flash">
+        <?php $this->renderRegion("flash")?>
+    </div>
+</div>
+<?php endif; ?>
+
+
+
 <!-- main -->
 <div class="outer-wrap-main">
     <div class="inner-wrap-main">

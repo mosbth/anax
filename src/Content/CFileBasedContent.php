@@ -56,7 +56,7 @@ class CFileBasedContent
     {
         $breadcrumbs = [];
 
-        while ($route !== "./") {
+        while ($route !== "./" && $route !== "/") {
             $routeIndex = $this->mapRoute2IndexKey($route);
             $item["url"] = $route;
             $item["text"] = $this->getBreadcrumbTitle($this->index[$routeIndex]["file"]);
@@ -534,15 +534,16 @@ class CFileBasedContent
 
 
     /**
-     * Load extra info intro views based of meta information provided in each
+     * Load extra info into views based of meta information provided in each
      * view.
      *
-     * @param string $view  with current settings.
-     * @param string $route to load view from.
+     * @param string $view    with current settings.
+     * @param string $route   to load view from.
+     * @param string $baseurl to prepend relative urls.
      *
      * @return array with view details.
      */
-    private function getAdditionalViewDataForRoute($view, $route)
+    private function getAdditionalViewDataForRoute($view, $route, $baseurl)
     {
         // Get filtered content from route
         list(, , $filtered) =
@@ -550,6 +551,7 @@ class CFileBasedContent
 
         // From document frontmatter
         $view["data"] = array_merge_recursive_distinct($view["data"], $filtered->frontmatter);
+        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
         $view["data"]["content"] = $filtered->text;
 
         return $view;
@@ -689,8 +691,10 @@ class CFileBasedContent
                         $views[$id]["data"]["previous"] = $previous;
                         break;
 
-                    case "single":
-                        $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"]);
+                    case "single": // OBSOLETE
+                    case "content":
+                        $baseurl = $this->getBaseurl($views, $id);
+                        $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"], $baseurl);
                         break;
 
                     case "toc":
@@ -711,20 +715,42 @@ class CFileBasedContent
 
 
     /**
-     * Parse text, find and update all a href to use baseurl.
+     * Get basurl from view, if it is defined.
      *
-     * @param object &$filtered with text and excerpt to process.
-     * @param array  $views     data for all views.
+     * @param array  $views   data for all views.
+     * @param string $current for current view if any.
      *
-     * @return void.
+     * @return string | null as baseurl.
      */
-    private function addBaseurl2AnchorUrls(&$filtered, $views)
+    private function getBaseurl($views, $current = null)
     {
-        $textf  = $this->di->get("textFilter");
-        $url    = $this->di->get("url");
         $baseurl = isset($views["main"]["data"]["baseurl"])
             ? $views["main"]["data"]["baseurl"]
             : null;
+
+        if ($current) {
+            $baseurl = isset($views[$current]["data"]["baseurl"])
+                ? $views[$current]["data"]["baseurl"]
+                : $baseurl;
+        }
+
+        return $baseurl;
+    }
+
+
+
+    /**
+     * Parse text, find and update all a href to use baseurl.
+     *
+     * @param object &$filtered with text and excerpt to process.
+     * @param string $baseurl   add as baseurl for all relative urls.
+     *
+     * @return void.
+     */
+    private function addBaseurl2AnchorUrls(&$filtered, $baseurl)
+    {
+        $textf  = $this->di->get("textFilter");
+        $url    = $this->di->get("url");
 
         // Use callback to url->create() instead of string concat
         $callback = function ($route) use ($url, $baseurl) {
@@ -843,8 +869,10 @@ class CFileBasedContent
         // frontmatter is complete.
         $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
 
-        // Update all anchor urls to use baseurl
-        $this->addBaseurl2AnchorUrls($filtered, $content["views"]);
+        // Update all anchor urls to use baseurl, needs info about baseurl
+        // from merged frontmatter
+        $baseurl = $this->getBaseurl($content["views"]);
+        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
 
         // Add excerpt and hasMore, if available
         $this->di->get("textFilter")->addExcerpt($filtered);
