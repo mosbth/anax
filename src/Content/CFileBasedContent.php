@@ -877,19 +877,12 @@ class CFileBasedContent
     /**
      * Map url to content, even internal content, if such mapping can be done.
      *
-     * @param string $route optional route to look up.
+     * @param string $route route to look up.
      *
      * @return object with content and filtered version.
      */
-    public function contentForInternalRoute($route = null)
+    public function createContentForInternalRoute($route)
     {
-        // Get the route
-        if (is_null($route)) {
-            $route = $this->di->get("request")->getRoute();
-        }
-
-        // TODO cache route content.
-
         // Load index and map route to content
         $this->loadIndex();
         $this->loadMetaIndex();
@@ -923,5 +916,34 @@ class CFileBasedContent
         $this->loadAdditionalContent($content["views"], $route, $routeIndex);
 
         return (object) $content;
+    }
+
+
+
+    /**
+     * Map url to content, even internal content, if such mapping can be done.
+     *
+     * @param string $route optional route to look up.
+     *
+     * @return object with content and filtered version.
+     */
+    public function contentForInternalRoute($route = null)
+    {
+        // Get the route
+        if (is_null($route)) {
+            $route = $this->di->get("request")->getRoute();
+        }
+
+        // Check cache for content or create cached version of content
+        $slug = $this->di->get("url")->slugify($route);
+        $key = $this->di->cache->createKey(__CLASS__, "route-$slug");
+        $content = $this->di->cache->get($key);
+
+        if (!$content || $this->ignoreCache) {
+            $content = $this->createContentForInternalRoute($route);
+            $this->di->cache->put($key, $content);
+        }
+
+        return $content;
     }
 }
