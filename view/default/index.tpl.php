@@ -77,6 +77,19 @@
 
 
 
+<!-- columns-above -->
+<?php if ($this->regionHasContent("columns-above")) : ?>
+<div class="outer-wrap-columns-above">
+    <div class="inner-wrap-columns-above">
+        <div class="columns-above">
+            <?php $this->renderRegion("columns-above")?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+
+
 <!-- main -->
 <div class="outer-wrap-main">
     <div class="inner-wrap-main">

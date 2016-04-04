@@ -561,6 +561,32 @@ class CFileBasedContent
 
 
     /**
+     * Load extra info into views based of meta information provided in each
+     * view.
+     *
+     * @param string $view    with current settings.
+     * @param string $route   to load view from.
+     * @param string $baseurl to prepend relative urls.
+     *
+     * @return array with view data details.
+     */
+    private function getViewDataForRoute($route, $baseurl)
+    {
+        // Get filtered content from route
+        list(, , $filtered) =
+            $this->mapRoute2Content($route);
+
+        $data = $filtered->frontmatter;
+        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
+        $data["content"] = $filtered->text;
+
+        return $data;
+
+    }
+
+
+
+    /**
      * Order and limit toc items.
      *
      * @param string &$toc  array with current toc.
@@ -695,6 +721,16 @@ class CFileBasedContent
                     case "content":
                         $baseurl = $this->getBaseurl($views, $id);
                         $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"], $baseurl);
+                        break;
+
+                    case "columns":
+                        $baseurl = $this->getBaseurl($views, $id);
+                        $columns = $meta["columns"];
+                        foreach ($columns as $key => $value) {
+                            $data = $this->getViewDataForRoute($value["route"], $baseurl);
+                            $columns[$key] = $data;
+                        }
+                        $views[$id]["data"]["columns"] = $columns;
                         break;
 
                     case "toc":

@@ -3,7 +3,15 @@
 $outerClass = isset($class) ? $class : null;
 $class = null;
 
-?><div <?= $this->classList("$outerClass-wrapper") ?>>
+$classes = isset($classes) ? $classes : null;
+
+
+
+?><div <?= $this->classList("columns $outerClass-wrapper", $classes) ?>>
+
+<?php if (isset($title)) : ?>
+    <h2><?= $title ?></h2>
+<?php endif; ?>
 
 <?php $i = 1; foreach ($columns as $column) : ?>
     <div <?= $this->classList("$outerClass") ?>>
