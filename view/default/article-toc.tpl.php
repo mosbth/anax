@@ -1,10 +1,10 @@
 <?php
-if (empty($toc)) {
+if (empty($articleToc)) {
     return;
 }
 
 // Prepare classes
-$classes[] = "block toc";
+$classes[] = "block toc article-toc";
 if (isset($class)) {
     $classes[] = $class;
 }
