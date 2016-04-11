@@ -566,13 +566,20 @@ class CFileBasedContent
      */
     private function getViewDataForRoute($route, $baseurl)
     {
+        // From configuration
+         $filter = $this->config["textfilter"];
+
         // Get filtered content from route
         list(, , $filtered) =
             $this->mapRoute2Content($route);
 
+        // Set data to be content of frontmatter
         $data = $filtered->frontmatter;
-        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
-        $data["content"] = $filtered->text;
+
+        // Do phase 2 processing
+        $new = $this->di->get("textFilter")->parse($filtered->text, $filter);
+        $this->addBaseurl2AnchorUrls($new, $baseurl);
+        $data["content"] = $new->text;
 
         return $data;
 
