@@ -148,11 +148,11 @@ trait THelpers
      *
      * @return array with values to extract in view.
      */
-    public function wrapElementWithStartEnd($text, $tag, $start, $end, $count)
+/*    public function wrapElementWithStartEnd($text, $tag, $start, $end, $count)
     {
         return $this->di->get("textFilter")->wrapElementWithStartEnd($text, $tag, $start, $end, $count);
     }
-
+*/
 
 
     /**
@@ -166,8 +166,10 @@ trait THelpers
      *
      * @return array with values to extract in view.
      */
+/*
     public function wrapElementContentWithStartEnd($text, $tag, $start, $end, $count)
     {
         return $this->di->get("textFilter")->wrapElementContentWithStartEnd($text, $tag, $start, $end, $count);
     }
+    */
 }

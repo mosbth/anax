@@ -353,23 +353,6 @@ class CFileBasedContent
 
 
     /**
-     * Get the title of a document.
-     *
-     * @deprecated in favor of getFrontmatter
-     *
-     * @param string $file to get title from.
-     *
-     * @return string as the title.
-     */
-    private function getTitle($file)
-    {
-        $frontmatter = $this->getFrontmatter($file);
-        return $frontmatter["title"];
-    }
-
-
-
-    /**
      * Get the title of a document to use for breadcrumb.
      *
      * @param string $file to get title from.
@@ -525,7 +508,10 @@ class CFileBasedContent
         unset($data["__toc__"]);
         unset($data["views"]);
         unset($frontmatter["views"]);
-        $data = array_merge_recursive_distinct($data, $frontmatter);
+
+        if ($frontmatter) {
+            $data = array_merge_recursive_distinct($data, $frontmatter);
+        }
         $views["main"]["data"] = array_merge_recursive_distinct($views["main"]["data"], $data);
 
         return $views;
@@ -545,14 +531,22 @@ class CFileBasedContent
      */
     private function getAdditionalViewDataForRoute($view, $route, $baseurl)
     {
+        // From configuration
+         $filter = $this->config["textfilter"];
+
         // Get filtered content from route
         list(, , $filtered) =
             $this->mapRoute2Content($route);
 
-        // From document frontmatter
-        $view["data"] = array_merge_recursive_distinct($view["data"], $filtered->frontmatter);
-        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
-        $view["data"]["content"] = $filtered->text;
+        // Merge view data with document frontmatter
+        if (!empty($filtered->frontmatter)) {
+            $view["data"] = array_merge_recursive_distinct($view["data"], $filtered->frontmatter);
+        }
+
+        // Do phase 2 processing
+        $new = $this->di->get("textFilter")->parse($filtered->text, $filter);
+        $this->addBaseurl2AnchorUrls($new, $baseurl);
+        $view["data"]["content"] = $new->text;
 
         return $view;
 
@@ -800,8 +794,8 @@ class CFileBasedContent
 
 
     /**
-     * Load extra info intro views based of meta information provided in each
-     * view.
+     * Load content file and frontmatter, this is the first time we process
+     * the content.
      *
      * @param string $key     array with all views.
      * @param string $content array with all views.
@@ -814,7 +808,7 @@ class CFileBasedContent
     {
         // Settings from config
         $basepath = $this->config["basepath"];
-        $filter   = $this->config["textfilter"];
+        $filter   = $this->config["textfilter-frontmatter"];
 
         // Whole path to file
         $path = $basepath . "/" . $content["file"];
@@ -855,6 +849,57 @@ class CFileBasedContent
 
 
     /**
+     * Look up the route in the index and use that to retrieve the filtered
+     * content.
+     *
+     * @param array  $content   to process.
+     * @param object &$filtered to use for settings.
+     *
+     * @return array with content and filtered version.
+     */
+     public function processContentPhaseTwo($content, &$filtered)
+     {
+        // From configuration
+         $filter = $this->config["textfilter"];
+         $revisionStart = $this->config["revision-history"]["start"];
+         $revisionEnd   = $this->config["revision-history"]["end"];
+         $revisionClass = $this->config["revision-history"]["class"];
+         
+         $textFilter = $this->di->get("textFilter");
+         $text = $filtered->text;
+
+         // Check if revision history is to be included
+         if (isset($content["views"]["main"]["data"]["revision"])) {
+             $text = $textFilter->addRevisionHistory(
+                 $text,
+                 $content["views"]["main"]["data"]["revision"],
+                 $revisionStart,
+                 $revisionEnd,
+                 $revisionClass
+             );
+         }
+
+         // Get new filtered content
+         $new = $textFilter->parse($text, $filter);
+         $filtered->text = $new->text;
+         if ($filtered->frontmatter) {
+             $filtered->frontmatter = array_merge_recursive_distinct($filtered->frontmatter, $new->frontmatter);
+         } else {
+             $filtered->frontmatter = $new->frontmatter;
+         }
+
+         // Update all anchor urls to use baseurl, needs info about baseurl
+         // from merged frontmatter
+         $baseurl = $this->getBaseurl($content["views"]);
+         $this->addBaseurl2AnchorUrls($filtered, $baseurl);
+
+         // Add excerpt and hasMore, if available
+         $textFilter->addExcerpt($filtered);
+    }
+
+
+
+    /**
      * Map url to content if such mapping can be done, exclude internal routes.
      *
      * @param string $route optional route to look up.
@@ -888,32 +933,23 @@ class CFileBasedContent
         $this->loadMetaIndex();
         list($routeIndex, $content, $filtered) = $this->mapRoute2Content($route);
 
+        // Create and arrange the content as views, merge with .meta,
+        // frontmatter is complete.
+        $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
+
+        // Do process content step two when all frontmatter is included.
+        $this->processContentPhaseTwo($content, $filtered);
+        
+        // Set details of content
+        $content["views"]["main"]["data"]["content"] = $filtered->text;
+        $content["views"]["main"]["data"]["excerpt"] = $filtered->excerpt;
+        $this->loadAdditionalContent($content["views"], $route, $routeIndex);
+
         // TODO Should not supply all frontmatter to theme, only the
         // parts valid to the index template. Separate that data into own
         // holder in frontmatter. Do not include whole frontmatter? Only
         // on debg?
         $content["frontmatter"] = $filtered->frontmatter;
-
-        // Create and arrange the content as views, merge with .meta,
-        // frontmatter is complete.
-        $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
-
-        // Update all anchor urls to use baseurl, needs info about baseurl
-        // from merged frontmatter
-        $baseurl = $this->getBaseurl($content["views"]);
-        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
-
-        // Add excerpt and hasMore, if available
-        $this->di->get("textFilter")->addExcerpt($filtered);
-
-        //
-        // TODO Load content, pure or use data available
-        // own function
-        // perhaps load in separate view
-        //
-        $content["views"]["main"]["data"]["content"] = $filtered->text;
-        $content["views"]["main"]["data"]["excerpt"] = $filtered->excerpt;
-        $this->loadAdditionalContent($content["views"], $route, $routeIndex);
 
         return (object) $content;
     }
