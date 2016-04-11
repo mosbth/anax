@@ -170,4 +170,36 @@ trait THelpers
     {
         return $this->di->get("textFilter")->wrapElementContentWithStartEnd($text, $tag, $start, $end, $count);
     }
+
+
+
+    /**
+     * Extrat the publish or update date for the article.
+     *
+     * @param array $dates a collection of possible date values.
+     *
+     * @return array with values for showing the date.
+     */
+    public function getPublishedDate($dates)
+    {
+        $defaults = [
+            "revision" => [],
+            "published" => null,
+            "updated" => null,
+            "created" => null,
+        ];
+        $dates = array_merge($defaults, $dates);
+        
+        if ($dates["revision"]) {
+            return [t("Latest revision"), key($dates["revision"])];
+        } elseif ($dates["published"]) {
+            return [t("Published"), $dates["published"]];
+        } elseif($dates["updated"]) {
+            return [t("Updated"), $dates["updated"]];
+        } elseif($dates["created"]) {
+            return [t("Created"), $dates["created"]];
+        }
+
+        return [t("Missing pubdate."), null];
+    }
 }

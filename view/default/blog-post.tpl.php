@@ -13,15 +13,17 @@ $categoryLabel = isset($label["category"])
 // Defaults
 $category = isset($category) ? $category : null;
 
+// Get time for publish/update/create
+list($pubStr, $published) = $this->getPublishedDate(get_defined_vars());
+
 // Add meta header to h1
 $byStr = t("By");
-$pubStr = t("Published");
 $header = <<<EOD
 <header>
     <h1\$1>\$2</h1>
     <p class="meta-header">
     <adress class="author">$byStr <a rel="author" href="/author/">$author</a>.</adress>
-    $pubStr <time pubdate datetime="$published">$published</time>
+    $pubStr <time pubdate datetime="$published">$published</time>.
     </p>
 </header>
 EOD;
