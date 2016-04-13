@@ -292,7 +292,7 @@ class CFileBasedContent
     private function createMetaIndex()
     {
         $basepath = $this->config["basepath"];
-        $filter   = $this->config["metafilter"];
+        $filter   = $this->config["textfilter-frontmatter"];
         $meta     = $this->config["meta"];
         $path     = "$basepath/$meta";
 
@@ -333,6 +333,32 @@ class CFileBasedContent
 
 
     /**
+     * Load the content from filtered and parse it step two.
+     *
+     * @param string $file to get content from.
+     *
+     * @return object as filtered content.
+     */
+    private function loadPureContentPhase2($filtered)
+    {
+        $filter = $this->config["textfilter"];
+        $text = $filtered->text;
+
+        // Get new filtered content
+        $new = $this->di->get("textFilter")->parse($text, $filter);
+        $filtered->text = $new->text;
+
+        // Update all anchor urls to use baseurl, needs info about baseurl
+        // from merged frontmatter
+        //$baseurl = $this->getBaseurl($content["views"]);
+        //$this->addBaseurl2AnchorUrls($filtered, $baseurl);
+
+        return $filtered;
+    }
+
+
+
+    /**
      * Get the frontmatter of a document.
      *
      * @param string $file to get frontmatter from.
@@ -342,11 +368,13 @@ class CFileBasedContent
     private function getFrontmatter($file)
     {
         $basepath = $this->config["basepath"];
-        $filter   = $this->config["textfilter"];
-
+        $filter1  = $this->config["textfilter-frontmatter"];
+        $filter2  = $this->config["textfilter"];
+        $filter = array_merge($filter1, $filter2);
+        
         $path = $basepath . "/" . $file;
         $src = file_get_contents($path);
-        $filtered = $this->di->textFilter->parse($src, $filter);
+        $filtered = $this->di->get("textFilter")->parse($src, $filter);
         return $filtered->frontmatter;
     }
 
@@ -544,6 +572,7 @@ class CFileBasedContent
         }
 
         // Do phase 2 processing
+        // TODO Missing update to frontmatter
         $new = $this->di->get("textFilter")->parse($filtered->text, $filter);
         $this->addBaseurl2AnchorUrls($new, $baseurl);
         $view["data"]["content"] = $new->text;
@@ -682,6 +711,38 @@ class CFileBasedContent
 
 
     /**
+     * Find next and previous links of current content.
+     *
+     * @param array|string $author with details on the author(s).
+     *
+     * @return array with more details on the authors(s).
+     */
+    private function loadAuthorData($author)
+    {
+        if (!is_array($author)) {
+            $acronym = $author;
+            $author = [];
+            $author[] = $acronym;
+        }
+        
+        $authors = [];
+        foreach ($author as $acronym) {
+            // Author information needs to be loaded into separate array.
+            // Join details with author.
+            // Nice method to load details, load internal?
+            $authors[] = [
+                "acronym" => $acronym,
+                "name"    => "Mikael Roos",
+                "byline"  => "Moped",
+            ];
+        }
+
+        return $authors;
+    }
+
+
+
+    /**
      * Load extra info into views based of meta information provided in each
      * view.
      *
@@ -740,6 +801,10 @@ class CFileBasedContent
                         $this->orderAndlimitToc($toc, $meta);
                         $views[$id]["data"]["toc"] = $toc;
                         $views[$id]["data"]["meta"] = $meta;
+                        break;
+
+                    case "author":
+                        $views[$id]["data"]["author"] = $this->loadAuthorData($views["main"]["data"]["author"]);
                         break;
 
                     default:
@@ -886,7 +951,7 @@ class CFileBasedContent
              );
          }
 
-         // Get new filtered content
+         // Get new filtered content (and updated frontmatter)
          $new = $textFilter->parse($text, $filter);
          $filtered->text = $new->text;
          if ($filtered->frontmatter) {
