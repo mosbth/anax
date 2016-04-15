@@ -8,15 +8,36 @@ namespace Anax\Content;
 class CFileBasedContent
 {
     use \Anax\TConfigure,
-        \Anax\DI\TInjectionAware;
+        \Anax\DI\TInjectionAware,
+        TFBCBreadcrumb,
+        TFBCLoadAdditionalContent,
+        TFBCUtilities;
 
 
 
     /**
-     * Properties.
+     * All routes.
      */
     private $index = null;
+
+    /**
+     * All authors.
+     */
+    private $author = null;
+
+    /**
+     * All categories.
+     */
+    private $category = null;
+
+    /**
+     * All routes having meta.
+     */
     private $meta = null;
+
+    /**
+     * Use cache or recreate each time.
+     */
     private $ignoreCache = false;
     
     /**
@@ -42,65 +63,6 @@ class CFileBasedContent
      * Routes that should be used in toc.
      */
     private $allowedInTocPattern = "([\d]+_(\w)+)";
-
-
-
-    /**
-     * Create a breadcrumb, append slash / to all dirs.
-     *
-     * @param string $route      current route.
-     *
-     * @return array with values for the breadcrumb.
-     */
-    public function createBreadcrumb($route)
-    {
-        $breadcrumbs = [];
-
-        while ($route !== "./" && $route !== "/") {
-            $routeIndex = $this->mapRoute2IndexKey($route);
-            $item["url"] = $route;
-            $item["text"] = $this->getBreadcrumbTitle($this->index[$routeIndex]["file"]);
-            $breadcrumbs[] = $item;
-            $route = dirname($route) . "/";
-        }
-
-        krsort($breadcrumbs);
-        return $breadcrumbs;
-    }
-
-
-
-/**
- * Get time when the content was last updated.
- *
- * @return string with the time.
- */
-/*public function PublishTime() {
-  if(!empty($this['published'])) {
-    return $this['published'];
-  } else if(isset($this['updated'])) {
-    return $this['updated'];
-  } else {
-    return $this['created'];
-  } 
-}
-*/
-/**
- * Get the action for latest updated of the content.
- *
- * @return string with the time.
- */
-/*public function PublishAction() {
-  if(!empty($this['published'])) {
-    //return t('Published');
-    return t('Last updated');
-  } else if(isset($this['updated'])) {
-    return t('Updated');
-  } else {
-    return t('Created');
-  } 
-}
-*/
 
 
 
@@ -137,37 +99,81 @@ class CFileBasedContent
 
 
     /**
-     * Get the index as an array.
+     * Create the index of all content into an array.
      *
-     * @return array as index.
+     * @param string $type of index to load.
+     *
+     * @return void.
      */
-    public function getIndex()
+    private function load($type)
     {
-        return $this->loadIndex();
+        $index = $this->$type;
+        if ($index) {
+            return;
+        }
+
+        $cache = $this->di->get("cache");
+        $key = $cache->createKey(__CLASS__, $type);
+        $index = $cache->get($key);
+
+        if (is_null($index) || $this->ignoreCache) {
+            $createMethod = "create$type";
+            $index = $this->$createMethod();
+            $cache->put($key, $index);
+        }
+
+        $this->$type = $index;
     }
 
 
 
+
+    // = Create and manage index ==================================
+
     /**
-     * Create the index of all content into an array.
+     * Generate an index from the directory structure.
      *
-     * @return array as index.
+     * @return array as index for all content files.
      */
-    private function loadIndex()
+    private function createIndex()
     {
-        if ($this->index) {
-            return $this->index;
+        $basepath   = $this->config["basepath"];
+        $pattern    = $this->config["pattern"];
+        $path       = "$basepath/$pattern";
+
+        $index = [];
+        foreach (glob_recursive($path) as $file) {
+            $filepath = substr($file, strlen($basepath) + 1);
+
+            // Find content files
+            $matches = [];
+            preg_match($this->filenamePattern, basename($filepath), $matches);
+            $dirpart = dirname($filepath) . "/";
+            if ($dirpart === "./") {
+                $dirpart = null;
+            }
+            $key = $dirpart . $matches[2];
+            
+            // Create level depending on the file id
+            // TODO ciamge doc, can be replaced by __toc__ in meta?
+            $id = $matches[1];
+            $level = 2;
+            if ($id % 100 === 0) {
+                $level = 0;
+            } elseif ($id % 10 === 0) {
+                $level = 1;
+            }
+
+            $index[$key] = [
+                "file"     => $filepath,
+                "section"  => $matches[1],
+                "level"    => $level,  // TODO ?
+                "internal" => $this->isInternalRoute($filepath),
+                "tocable"  => $this->allowInToc($filepath),
+            ];
         }
 
-        $key = $this->di->cache->createKey(__CLASS__, "index");
-        $this->index = $this->di->cache->get($key);
-
-        if (!$this->index || $this->ignoreCache) {
-            $this->index = $this->createIndex();
-            $this->di->cache->put($key, $this->index);
-        }
-
-        return $this->index;
+        return $index;
     }
 
 
@@ -213,104 +219,40 @@ class CFileBasedContent
 
 
 
-    /**
-     * Generate an index from the directory structure.
-     *
-     * @return array as index for all content files.
-     */
-    private function createIndex()
-    {
-        $basepath   = $this->config["basepath"];
-        $pattern    = $this->config["pattern"];
-        $path       = "$basepath/$pattern";
-
-        $index = [];
-        foreach (glob_recursive($path) as $file) {
-            $filepath = substr($file, strlen($basepath) + 1);
-
-            // Find content files
-            $matches = [];
-            preg_match($this->filenamePattern, basename($filepath), $matches);
-            $dirpart = dirname($filepath) . "/";
-            if ($dirpart === "./") {
-                $dirpart = null;
-            }
-            $key = $dirpart . $matches[2];
-            
-            // Create level depending on the file id
-            $id = $matches[1];
-            $level = 2;
-            if ($id % 100 === 0) {
-                $level = 0;
-            } elseif ($id % 10 === 0) {
-                $level = 1;
-            }
-
-            $index[$key] = [
-                "file"     => $filepath,
-                "section"  => $matches[1],
-                "level"    => $level,
-                "internal" => $this->isInternalRoute($filepath),
-                "tocable"  => $this->allowInToc($filepath),
-            ];
-        }
-
-        return $index;
-    }
-
-
-
-    /**
-     * Create the index of all meta content into an array.
-     *
-     * @return array as index.
-     */
-    private function loadMetaIndex()
-    {
-        if ($this->meta) {
-            return $this->meta;
-        }
-
-        $key = $this->di->cache->createKey(__CLASS__, "meta");
-        $this->meta = $this->di->cache->get($key);
-
-        if (!$this->meta || $this->ignoreCache) {
-            $this->meta = $this->createMetaIndex();
-            $this->di->cache->put($key, $this->meta);
-        }
-
-        return $this->meta;
-    }
-
-
+    // = Create and manage meta ==================================
 
     /**
      * Generate an index for meta files.
      *
-     * @return array as table of content.
+     * @return array as meta index.
      */
-    private function createMetaIndex()
+    private function createMeta()
     {
         $basepath = $this->config["basepath"];
         $filter   = $this->config["textfilter-frontmatter"];
-        $meta     = $this->config["meta"];
-        $path     = "$basepath/$meta";
+        $pattern  = $this->config["meta"];
+        $path     = "$basepath/$pattern";
+        $textfilter = $this->di->get("textFilter");
 
-        $meta = [];
+        $index = [];
         foreach (glob_recursive($path) as $file) {
-            $filepath = substr($file, strlen($basepath) + 1);
-            
-            $src = file_get_contents($file);
-            $filtered = $this->di->get("textFilter")->parse($src, $filter);
+            // The key entry to index
+            $key = dirname(substr($file, strlen($basepath) + 1));
 
-            $key = dirname($filepath);
-            $meta[$key] = $filtered->frontmatter;
+            // Get info from base document
+            $src = file_get_contents($file);
+            $filtered = $textfilter->parse($src, $filter);
+            $index[$key] = $filtered->frontmatter;
 
             // Add Toc to the data array
-            $meta[$key]["__toc__"] = $this->createBaseRouteToc(dirname($filepath));
+            $index[$key]["__toc__"] = $this->createBaseRouteToc($key);
         }
 
-        return $meta;
+        // Add author details
+        $this->meta = $index;
+        $this->createAuthor();
+
+        return $this->meta;
     }
 
 
@@ -328,75 +270,6 @@ class CFileBasedContent
         return isset($this->meta[$base])
             ? $this->meta[$base]
             : [];
-    }
-
-
-
-    /**
-     * Load the content from filtered and parse it step two.
-     *
-     * @param string $file to get content from.
-     *
-     * @return object as filtered content.
-     */
-    private function loadPureContentPhase2($filtered)
-    {
-        $filter = $this->config["textfilter"];
-        $text = $filtered->text;
-
-        // Get new filtered content
-        $new = $this->di->get("textFilter")->parse($text, $filter);
-        $filtered->text = $new->text;
-
-        // Update all anchor urls to use baseurl, needs info about baseurl
-        // from merged frontmatter
-        //$baseurl = $this->getBaseurl($content["views"]);
-        //$this->addBaseurl2AnchorUrls($filtered, $baseurl);
-
-        return $filtered;
-    }
-
-
-
-    /**
-     * Get the frontmatter of a document.
-     *
-     * @param string $file to get frontmatter from.
-     *
-     * @return array as frontmatter.
-     */
-    private function getFrontmatter($file)
-    {
-        $basepath = $this->config["basepath"];
-        $filter1  = $this->config["textfilter-frontmatter"];
-        $filter2  = $this->config["textfilter"];
-        $filter = array_merge($filter1, $filter2);
-        
-        $path = $basepath . "/" . $file;
-        $src = file_get_contents($path);
-        $filtered = $this->di->get("textFilter")->parse($src, $filter);
-        return $filtered->frontmatter;
-    }
-
-
-
-    /**
-     * Get the title of a document to use for breadcrumb.
-     *
-     * @param string $file to get title from.
-     *
-     * @return string as the breadcrumb title.
-     */
-    private function getBreadcrumbTitle($file)
-    {
-        $frontmatter = $this->getFrontmatter($file);
-
-        $title = $frontmatter["title"];
-        if (isset($frontmatter["titleBreadcrumb"])) {
-            $title = $frontmatter["titleBreadcrumb"];
-        }
-
-        return $title;
     }
 
 
@@ -432,6 +305,135 @@ class CFileBasedContent
 
 
 
+    // = Deal with authors ====================================
+    
+    /**
+     * Generate a lookup index for authors that maps into the meta entry
+     * for the author.
+     *
+     * @return void.
+     */
+    private function createAuthor()
+    {
+        $pattern = $this->config["author"];
+
+        $index = [];
+        $matches = [];
+        foreach ($this->meta as $key => $entry) {
+            if (preg_match($pattern, $key, $matches)) {
+                $acronym = $matches[1];
+                $index[$acronym] = $key;
+                $this->meta[$key]["acronym"] = $acronym;
+                
+                // Get content for byline
+                $route = "$key/byline";
+                $data = $this->getDataForAdditionalRoute($route);
+                $this->meta[$key]["byline"] = $data["content"];
+            }
+        }
+
+        return $index;
+    }
+
+
+
+    /**
+     * Find next and previous links of current content.
+     *
+     * @param array|string $author with details on the author(s).
+     *
+     * @return array with more details on the authors(s).
+     */
+    private function loadAuthorDetails($author)
+    {
+        if (is_array($author) && is_array(array_values($author)[0])) {
+            return $author;
+        }
+
+        if (!is_array($author)) {
+            $tmp = $author;
+            $author = [];
+            $author[] = $tmp;
+        }
+
+        $authors = [];
+        foreach ($author as $acronym) {
+            if (isset($this->author[$acronym])) {
+                $key = $this->author[$acronym];
+                $authors[$acronym] = $this->meta[$key];
+                unset($authors[$acronym]["__toc__"]);
+            }
+        }
+
+        return $authors;
+    }
+
+
+
+    // == Used by meta and breadcrumb (to get title) ===========================
+    // TODO REFACTOR THIS?
+    // Support getting only frontmatter.
+    // Merge with function that retrieves whole filtered since getting
+    // frontmatter will involve full parsing of document.
+    // Title is retrieved from the HTML code.
+    // Also do cacheing of each retrieved and parsed document
+    // in this cycle, to gather code that loads and parses a individual
+    // document. 
+    
+    /**
+     * Get the frontmatter of a document.
+     *
+     * @param string $file to get frontmatter from.
+     *
+     * @return array as frontmatter.
+     */
+    private function getFrontmatter($file)
+    {
+        $basepath = $this->config["basepath"];
+        $filter1  = $this->config["textfilter-frontmatter"];
+        $filter2  = $this->config["textfilter"];
+        $filter = array_merge($filter1, $filter2);
+        
+        $path = $basepath . "/" . $file;
+        $src = file_get_contents($path);
+        $filtered = $this->di->get("textFilter")->parse($src, $filter);
+        return $filtered->frontmatter;
+    }
+
+
+
+    // = Section X to be labeled  ==================================
+
+    /**
+     * Load the content from filtered and parse it step two.
+     *
+     * @param string $file to get content from.
+     *
+     * @return object as filtered content.
+     */
+/*
+    private function loadPureContentPhase2($filtered)
+    {
+        $filter = $this->config["textfilter"];
+        $text = $filtered->text;
+
+        // Get new filtered content
+        $new = $this->di->get("textFilter")->parse($text, $filter);
+        $filtered->text = $new->text;
+
+        // Update all anchor urls to use baseurl, needs info about baseurl
+        // from merged frontmatter
+        //$baseurl = $this->getBaseurl($content["views"]);
+        //$this->addBaseurl2AnchorUrls($filtered, $baseurl);
+
+        return $filtered;
+    }
+
+*/
+
+
+    // == Look up route in index ===================================
+    
     /**
      * Map the route to the correct key in the index.
      *
@@ -476,6 +478,8 @@ class CFileBasedContent
 
 
 
+    // = Get view data by merging from meta and current frontmatter =========
+    
     /**
      * Get view by mergin information from meta and frontmatter.
      *
@@ -547,356 +551,42 @@ class CFileBasedContent
 
 
 
-    /**
-     * Load extra info into views based of meta information provided in each
-     * view.
-     *
-     * @param string $view    with current settings.
-     * @param string $route   to load view from.
-     * @param string $baseurl to prepend relative urls.
-     *
-     * @return array with view details.
-     */
-    private function getAdditionalViewDataForRoute($view, $route, $baseurl)
-    {
-        // From configuration
-         $filter = $this->config["textfilter"];
-
-        // Get filtered content from route
-        list(, , $filtered) =
-            $this->mapRoute2Content($route);
-
-        // Merge view data with document frontmatter
-        if (!empty($filtered->frontmatter)) {
-            $view["data"] = array_merge_recursive_distinct($view["data"], $filtered->frontmatter);
-        }
-
-        // Do phase 2 processing
-        // TODO Missing update to frontmatter
-        $new = $this->di->get("textFilter")->parse($filtered->text, $filter);
-        $this->addBaseurl2AnchorUrls($new, $baseurl);
-        $view["data"]["content"] = $new->text;
-
-        return $view;
-
-    }
-
-
+    // == Create and load content ===================================
 
     /**
-     * Load extra info into views based of meta information provided in each
-     * view.
+     * Map url to content, even internal content, if such mapping can be done.
      *
-     * @param string $view    with current settings.
-     * @param string $route   to load view from.
-     * @param string $baseurl to prepend relative urls.
+     * @param string $route route to look up.
      *
-     * @return array with view data details.
+     * @return object with content and filtered version.
      */
-    private function getViewDataForRoute($route, $baseurl)
+    private function createContentForInternalRoute($route)
     {
-        // From configuration
-         $filter = $this->config["textfilter"];
+        // Load index and map route to content
+        $this->load("index");
+        $this->load("meta");
+        $this->load("author");
+        list($routeIndex, $content, $filtered) = $this->mapRoute2Content($route);
 
-        // Get filtered content from route
-        list(, , $filtered) =
-            $this->mapRoute2Content($route);
+        // Create and arrange the content as views, merge with .meta,
+        // frontmatter is complete.
+        $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
 
-        // Set data to be content of frontmatter
-        $data = $filtered->frontmatter;
-
-        // Do phase 2 processing
-        $new = $this->di->get("textFilter")->parse($filtered->text, $filter);
-        $this->addBaseurl2AnchorUrls($new, $baseurl);
-        $data["content"] = $new->text;
-
-        return $data;
-
-    }
-
-
-
-    /**
-     * Order and limit toc items.
-     *
-     * @param string &$toc  array with current toc.
-     * @param string &$meta on how to order and limit toc.
-     *
-     * @return void.
-     */
-    private function orderAndlimitToc(&$toc, &$meta)
-    {
-        $defaults = [
-            "items" => 7,
-            "offset" => 0,
-            "orderby" => "section",
-            "orderorder" => "asc",
-        ];
-        $options = array_merge($defaults, $meta);
-        $orderby = $options["orderby"];
-        $order   = $options["orderorder"];
-
-        $meta["totalItems"] = count($toc);
-
-        // TODO support pagination by adding entries to $meta
-
-        uksort($toc, function ($a, $b) use ($toc, $orderby, $order) {
-            $a = $toc[$a][$orderby];
-            $b = $toc[$b][$orderby];
-
-            if ($order == "asc") {
-                return strcmp($a, $b);
-            }
-            return strcmp($b, $a);
-        });
-
-        $toc = array_slice($toc, $options["offset"], $options["items"]);
-        $meta["displayedItems"] = count($toc);
-    }
-
-
-
-    /**
-     * Find next and previous links of current content.
-     *
-     * @param string $routeIndex target route to find next and previous for.
-     *
-     * @return array with next and previous if found.
-     */
-    private function findNextAndPrevious($routeIndex)
-    {
-        $key = dirname($routeIndex);
-        if (!isset($this->meta[$key]["__toc__"])) {
-            return [null, null];
-        }
-
-        $toc = $this->meta[$key]["__toc__"];
-        if (!isset($toc[$routeIndex])) {
-            return [null, null];
-        }
-
-        $index2Key = array_keys($toc);
-        $keys = array_flip($index2Key);
-        $values = array_values($toc);
-        $count = count($keys);
-
-        $current = $keys[$routeIndex];
-        $previous = null;
-        for ($i = $current - 1; $i >= 0; $i--) {
-            $isSectionHeader = $values[$i]["sectionHeader"];
-            $isInternal = $values[$i]["internal"];
-            if ($isSectionHeader || $isInternal) {
-                continue;
-            }
-            $previous = $values[$i];
-            $previous["route"] = $index2Key[$i];
-            break;
-        }
+        // Do process content step two when all frontmatter is included.
+        $this->processMainContentPhaseTwo($content, $filtered);
         
-        $next = null;
-        for ($i = $current + 1; $i < $count; $i++) {
-            $isSectionHeader = $values[$i]["sectionHeader"];
-            $isInternal = $values[$i]["internal"];
-            if ($isSectionHeader || $isInternal) {
-                continue;
-            }
-            $next = $values[$i];
-            $next["route"] = $index2Key[$i];
-            break;
-        }
+        // Set details of content
+        $content["views"]["main"]["data"]["content"] = $filtered->text;
+        $content["views"]["main"]["data"]["excerpt"] = $filtered->excerpt;
+        $this->loadAdditionalContent($content["views"], $route, $routeIndex);
 
-        return [$next, $previous];
-    }
+        // TODO Should not supply all frontmatter to theme, only the
+        // parts valid to the index template. Separate that data into own
+        // holder in frontmatter. Do not include whole frontmatter? Only
+        // on debg?
+        $content["frontmatter"] = $filtered->frontmatter;
 
-
-
-    /**
-     * Find next and previous links of current content.
-     *
-     * @param array|string $author with details on the author(s).
-     *
-     * @return array with more details on the authors(s).
-     */
-    private function loadAuthorData($author)
-    {
-        if (!is_array($author)) {
-            $acronym = $author;
-            $author = [];
-            $author[] = $acronym;
-        }
-        
-        $authors = [];
-        foreach ($author as $acronym) {
-            // Author information needs to be loaded into separate array.
-            // Join details with author.
-            // Nice method to load details, load internal?
-            $authors[] = [
-                "acronym" => $acronym,
-                "name"    => "Mikael Roos",
-                "byline"  => "Moped",
-            ];
-        }
-
-        return $authors;
-    }
-
-
-
-    /**
-     * Load extra info into views based of meta information provided in each
-     * view.
-     *
-     * @param array  &$views     with all views.
-     * @param string $route      current route
-     * @param string $routeIndex route with appended /index
-     *
-     * @throws NotFoundException when mapping can not be done.
-     *
-     * @return void.
-     */
-    private function loadAdditionalContent(&$views, $route, $routeIndex)
-    {
-        foreach ($views as $id => $view) {
-            $meta = isset($view["data"]["meta"])
-                ? $view["data"]["meta"]
-                : null;
-
-            if (is_array($meta)) {
-                switch ($meta["type"]) {
-                    case "article-toc":
-                        $content = $views["main"]["data"]["content"];
-                        $views[$id]["data"]["articleToc"] = $this->di->textFilter->createToc($content);
-                        break;
-
-                    case "breadcrumb":
-                        $views[$id]["data"]["breadcrumb"] = $this->createBreadcrumb($route);
-                        break;
-
-                    case "next-previous":
-                        $baseRoute = dirname($routeIndex);
-                        list($next, $previous) = $this->findNextAndPrevious($routeIndex);
-                        $views[$id]["data"]["next"] = $next;
-                        $views[$id]["data"]["previous"] = $previous;
-                        break;
-
-                    case "single": // OBSOLETE
-                    case "content":
-                        $baseurl = $this->getBaseurl($views, $id);
-                        $views[$id] = $this->getAdditionalViewDataForRoute($view, $meta["route"], $baseurl);
-                        break;
-
-                    case "columns":
-                        $baseurl = $this->getBaseurl($views, $id);
-                        $columns = $meta["columns"];
-                        foreach ($columns as $key => $value) {
-                            $data = $this->getViewDataForRoute($value["route"], $baseurl);
-                            $columns[$key] = $data;
-                        }
-                        $views[$id]["data"]["columns"] = $columns;
-                        break;
-
-                    case "toc":
-                        $baseRoute = dirname($routeIndex);
-                        $toc = $this->meta[$baseRoute]["__toc__"];
-                        $this->orderAndlimitToc($toc, $meta);
-                        $views[$id]["data"]["toc"] = $toc;
-                        $views[$id]["data"]["meta"] = $meta;
-                        break;
-
-                    case "author":
-                        $views[$id]["data"]["author"] = $this->loadAuthorData($views["main"]["data"]["author"]);
-                        break;
-
-                    default:
-                        throw new Exception(t("Unsupported data/meta/type for additional content."));
-                }
-            }
-        }
-    }
-
-
-
-    /**
-     * Get basurl from view, if it is defined.
-     *
-     * @param array  $views   data for all views.
-     * @param string $current for current view if any.
-     *
-     * @return string | null as baseurl.
-     */
-    private function getBaseurl($views, $current = null)
-    {
-        $baseurl = isset($views["main"]["data"]["baseurl"])
-            ? $views["main"]["data"]["baseurl"]
-            : null;
-
-        if ($current) {
-            $baseurl = isset($views[$current]["data"]["baseurl"])
-                ? $views[$current]["data"]["baseurl"]
-                : $baseurl;
-        }
-
-        return $baseurl;
-    }
-
-
-
-    /**
-     * Parse text, find and update all a href to use baseurl.
-     *
-     * @param object &$filtered with text and excerpt to process.
-     * @param string $baseurl   add as baseurl for all relative urls.
-     *
-     * @return void.
-     */
-    private function addBaseurl2AnchorUrls(&$filtered, $baseurl)
-    {
-        $textf  = $this->di->get("textFilter");
-        $url    = $this->di->get("url");
-
-        // Use callback to url->create() instead of string concat
-        $callback = function ($route) use ($url, $baseurl) {
-            return $url->create($route, $baseurl);
-        };
-
-        $filtered->text =
-            $textf->addBaseurlToRelativeLinks($filtered->text, $baseurl, $callback);
-    }
-
-
-
-    /**
-     * Load content file and frontmatter, this is the first time we process
-     * the content.
-     *
-     * @param string $key     array with all views.
-     * @param string $content array with all views.
-     *
-     * @throws NotFoundException when mapping can not be done.
-     *
-     * @return void.
-     */
-    private function loadFileContent($key, $content)
-    {
-        // Settings from config
-        $basepath = $this->config["basepath"];
-        $filter   = $this->config["textfilter-frontmatter"];
-
-        // Whole path to file
-        $path = $basepath . "/" . $content["file"];
-        $content["path"] = $path;
-
-        // Load content from file
-        if (!is_file($path)) {
-            $msg = t("The content '!ROUTE' does not exists as a file '!FILE'.", ["!ROUTE" => $key, "!FILE" => $path]);
-            throw new \Anax\Exception\NotFoundException($msg);
-        }
-
-        // Get filtered content
-        $src = file_get_contents($path);
-        $filtered = $this->di->get("textFilter")->parse($src, $filter);
-
-        return [$content, $filtered];
+        return (object) $content;
     }
 
 
@@ -909,11 +599,11 @@ class CFileBasedContent
      *
      * @return array with content and filtered version.
      */
-    public function mapRoute2Content($route)
+    private function mapRoute2Content($route)
     {
         // Look it up in the index
         list($keyIndex, $content) = $this->mapRoute2Index($route);
-        list($content, $filtered) = $this->loadFileContent($keyIndex, $content);
+        $filtered = $this->loadFileContentPhaseOne($keyIndex);
 
         return [$keyIndex, $content, $filtered];
     }
@@ -921,15 +611,52 @@ class CFileBasedContent
 
 
     /**
+     * Load content file and frontmatter, this is the first time we process
+     * the content.
+     *
+     * @param string $key     to index with details on the route.
+     *
+     * @throws NotFoundException when mapping can not be done.
+     *
+     * @return void.
+     */
+    private function loadFileContentPhaseOne($key)
+    {
+        // Settings from config
+        $basepath = $this->config["basepath"];
+        $filter   = $this->config["textfilter-frontmatter"];
+
+        // Whole path to file
+        $path = $basepath . "/" . $this->index[$key]["file"];
+
+        // Load content from file
+        if (!is_file($path)) {
+            $msg = t("The content '!ROUTE' does not exists as a file '!FILE'.", ["!ROUTE" => $key, "!FILE" => $path]);
+            throw new \Anax\Exception\NotFoundException($msg);
+        }
+
+        // Get filtered content
+        $src = file_get_contents($path);
+        $filtered = $this->di->get("textFilter")->parse($src, $filter);
+
+        return $filtered;
+    }
+
+
+
+    // == Process content phase 2 ===================================
+    // TODO REFACTOR THIS?
+    
+    /**
      * Look up the route in the index and use that to retrieve the filtered
      * content.
      *
-     * @param array  $content   to process.
+     * @param array  &$content   to process.
      * @param object &$filtered to use for settings.
      *
      * @return array with content and filtered version.
      */
-     public function processContentPhaseTwo($content, &$filtered)
+     private function processMainContentPhaseTwo(&$content, &$filtered)
      {
         // From configuration
          $filter = $this->config["textfilter"];
@@ -960,9 +687,16 @@ class CFileBasedContent
              $filtered->frontmatter = $new->frontmatter;
          }
 
+        // Load details on author if set.
+        if (isset($content["views"]["main"]["data"]["author"])) {
+            $content["views"]["main"]["data"]["author"] = $this->loadAuthorDetails($content["views"]["main"]["data"]["author"]);
+        }
+
          // Update all anchor urls to use baseurl, needs info about baseurl
          // from merged frontmatter
-         $baseurl = $this->getBaseurl($content["views"]);
+         $baseurl = isset($content["views"]["main"]["baseurl"])
+            ? $content["views"]["main"]["baseurl"]
+            : null;
          $this->addBaseurl2AnchorUrls($filtered, $baseurl);
 
          // Add excerpt and hasMore, if available
@@ -971,63 +705,8 @@ class CFileBasedContent
 
 
 
-    /**
-     * Map url to content if such mapping can be done, exclude internal routes.
-     *
-     * @param string $route optional route to look up.
-     *
-     * @return object with content and filtered version.
-     */
-    public function contentForRoute($route = null)
-    {
-        $content = $this->contentForInternalRoute($route);
-        if ($content->internal === true) {
-            $msg = t("The content '!ROUTE' does not exists as a public route.", ["!ROUTE" => $route]);
-            throw new \Anax\Exception\NotFoundException($msg);
-        }
-
-        return $content;
-    }
-
-
-
-    /**
-     * Map url to content, even internal content, if such mapping can be done.
-     *
-     * @param string $route route to look up.
-     *
-     * @return object with content and filtered version.
-     */
-    public function createContentForInternalRoute($route)
-    {
-        // Load index and map route to content
-        $this->loadIndex();
-        $this->loadMetaIndex();
-        list($routeIndex, $content, $filtered) = $this->mapRoute2Content($route);
-
-        // Create and arrange the content as views, merge with .meta,
-        // frontmatter is complete.
-        $content["views"] = $this->getViews($routeIndex, $filtered->frontmatter);
-
-        // Do process content step two when all frontmatter is included.
-        $this->processContentPhaseTwo($content, $filtered);
-        
-        // Set details of content
-        $content["views"]["main"]["data"]["content"] = $filtered->text;
-        $content["views"]["main"]["data"]["excerpt"] = $filtered->excerpt;
-        $this->loadAdditionalContent($content["views"], $route, $routeIndex);
-
-        // TODO Should not supply all frontmatter to theme, only the
-        // parts valid to the index template. Separate that data into own
-        // holder in frontmatter. Do not include whole frontmatter? Only
-        // on debg?
-        $content["frontmatter"] = $filtered->frontmatter;
-
-        return (object) $content;
-    }
-
-
-
+    // == Public methods ============================================
+    
     /**
      * Map url to content, even internal content, if such mapping can be done.
      *
@@ -1050,6 +729,26 @@ class CFileBasedContent
         if (!$content || $this->ignoreCache) {
             $content = $this->createContentForInternalRoute($route);
             $this->di->cache->put($key, $content);
+        }
+
+        return $content;
+    }
+
+
+
+    /**
+     * Map url to content if such mapping can be done, exclude internal routes.
+     *
+     * @param string $route optional route to look up.
+     *
+     * @return object with content and filtered version.
+     */
+    public function contentForRoute($route = null)
+    {
+        $content = $this->contentForInternalRoute($route);
+        if ($content->internal === true) {
+            $msg = t("The content '!ROUTE' does not exists as a public route.", ["!ROUTE" => $route]);
+            throw new \Anax\Exception\NotFoundException($msg);
         }
 
         return $content;

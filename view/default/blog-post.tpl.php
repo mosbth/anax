@@ -13,16 +13,27 @@ $categoryLabel = isset($label["category"])
 // Defaults
 $category = isset($category) ? $category : null;
 
+
 // Get time for publish/update/create
 list($pubStr, $published) = $this->getPublishedDate(get_defined_vars());
 
+
+// Get details on author.
+$authorStr = "";
+foreach ($author as $who) {
+    $authorStr .= "<a rel=\"author\" href=\"/author/${who["acronym"]}\">${who["name"]}</a>, ";
+}
+$authorStr = substr($authorStr, 0, -2);
+$byStr = t("By !AUTHORS.", ["!AUTHORS" => $authorStr]);
+
+
+
 // Add meta header to h1
-$byStr = t("By");
 $header = <<<EOD
 <header>
     <h1\$1>\$2</h1>
     <p class="meta-header">
-    <adress class="author">$byStr <a rel="author" href="/author/">$author</a>.</adress>
+    <adress class="author">$byStr</adress>
     $pubStr <time pubdate datetime="$published">$published</time>.
     </p>
 </header>
