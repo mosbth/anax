@@ -25,8 +25,10 @@ $readmoreLabel = isset($label["readmore"])
         //var_dump(get_defined_vars());
 
         // TODO Format the date
-        $datetime = $item["published"];
-        $date = $item["published"];
+        // Get time for publish/update/create
+        list($pubStr, $published) = $this->getPublishedDate($item);
+        //$datetime = $item["published"];
+        //$date = $item["published"];
         
         $category = isset($item["category"]) ? $item["category"] : null;
 
@@ -47,7 +49,7 @@ $readmoreLabel = isset($label["readmore"])
 
         ?><section <?= $this->classList("blog-list-item") ?>>
 
-            <span class="meta-header"><time datetime="<?= $datetime ?>"><?= $date ?></time></span>
+            <span class="meta-header"><time datetime="<?= $published ?>"><?= $published ?></time></span>
             
             <?= $excerpt ?>
             
