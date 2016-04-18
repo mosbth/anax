@@ -47,7 +47,14 @@ trait TFBCLoadAdditionalContent
 
                     case "single": // OBSOLETE
                     case "content":
-                        $data = $this->getDataForAdditionalRoute($meta["route"]);
+                        // Support relative routes
+                        $route = $meta["route"];
+                        if (substr_compare($route, "./", 0, 2) === 0) {
+                            $route = dirname($routeIndex) . "/" . substr($route, 2);
+                        }
+
+                        // Get the content
+                        $data = $this->getDataForAdditionalRoute($route);
                         $views[$id]["data"] = array_merge_recursive_distinct($views[$id]["data"], $data);
                         break;
 
