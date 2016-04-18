@@ -9,6 +9,11 @@
 <?php if (isset($siteLogoText)) : ?>
 <span class="site-logo-text" >
     <a href="<?= $this->url($homeLink) ?>">
+        <?php if (isset($siteLogoTextIcon)) : ?>
+        <span class="site-logo-text-icon" >
+            <img src="<?= $this->asset($siteLogoTextIcon) ?>" alt="<?= $siteLogoTextIconAlt ?>">
+        </span>
+        <?php endif; ?>        
         <?= $siteLogoText ?>
     </a>
 </span>
