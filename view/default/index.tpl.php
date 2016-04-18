@@ -143,7 +143,7 @@ $class .= empty($class) ? "" : "has-sidebar";
 
 <!-- render javascripts -->
 <?php if (isset($javascripts)) : foreach ($javascripts as $javascript) : ?>
-<script src="<?=$this->asset($javascript)?>"></script>
+<script async src="<?=$this->asset($javascript)?>"></script>
 <?php endforeach; endif; ?>
 
 
