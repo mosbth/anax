@@ -68,4 +68,19 @@ trait TFBCUtilities
         $filtered->text =
             $textf->addBaseurlToRelativeLinks($filtered->text, $baseurl, $callback);
     }
+
+
+
+    /**
+     * Get published date.
+     *
+     * @param array $frontmatter with details on dates.
+     *
+     * @return integer as time for publish time.
+     */
+    private function getPublishTime($frontmatter)
+    {
+        list(, $date) = $this->di->get("view")->getPublishedDate($frontmatter);
+        return strtotime($date);
+    }
 }

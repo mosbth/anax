@@ -172,10 +172,14 @@ trait TFBCLoadAdditionalContent
             $a = $toc[$a][$orderby];
             $b = $toc[$b][$orderby];
 
-            if ($order == "asc") {
-                return strcmp($a, $b);
+            $asc = $order == "asc" ? 1 : -1;
+            
+            if ($a == $b) {
+                return 0;
+            } elseif ($a > $b) {
+                return $asc;
             }
-            return strcmp($b, $a);
+            return -$asc;
         });
 
         $toc = array_slice($toc, $options["offset"], $options["items"]);

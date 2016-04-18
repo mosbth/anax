@@ -295,8 +295,13 @@ class CFileBasedContent
                     
                     $frontm = $this->getFrontmatter($value["file"]);
                     $toc[$key]["title"] = $frontm["title"];
-                    $toc[$key]["sectionHeader"] = isset($frontm["sectionHeader"]) ? $frontm["sectionHeader"] : null;
-                    $toc[$key]["linkable"] = isset($frontm["linkable"]) ? $frontm["linkable"] : null;
+                    $toc[$key]["publishTime"] = $this->getPublishTime($frontm);
+                    $toc[$key]["sectionHeader"] = isset($frontm["sectionHeader"])
+                        ? $frontm["sectionHeader"]
+                        : null;
+                    $toc[$key]["linkable"] = isset($frontm["linkable"])
+                        ? $frontm["linkable"]
+                        : null;
                 }
             }
         };

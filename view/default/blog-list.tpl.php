@@ -6,13 +6,12 @@ if (isset($class)) {
 }
 
 // Labels
-$categoryLabel = isset($label["category"])
-    ? $label["category"]
-    : null; 
-
 $readmoreLabel = isset($label["readmore"])
     ? $label["readmore"]
     : t("Read more »"); 
+
+// Common date format
+$dateFormat = isset($dateFormat) ? $dateFormat : "m/d/Y";
 
 
 
@@ -27,6 +26,7 @@ $readmoreLabel = isset($label["readmore"])
         // TODO Format the date
         // Get time for publish/update/create
         list($pubStr, $published) = $this->getPublishedDate($item);
+        $publishedFormatted = date($dateFormat, strtotime($published));
         //$datetime = $item["published"];
         //$date = $item["published"];
         
@@ -49,7 +49,7 @@ $readmoreLabel = isset($label["readmore"])
 
         ?><section <?= $this->classList("blog-list-item") ?>>
 
-            <span class="meta-header"><time datetime="<?= $published ?>"><?= $published ?></time></span>
+            <span class="meta-header"><time datetime="<?= $published ?>"><?= $publishedFormatted ?></time></span>
             
             <?= $excerpt ?>
             
@@ -58,7 +58,6 @@ $readmoreLabel = isset($label["readmore"])
             <?php 
             $this->renderView("default/blog-meta-footer", [
                 "category" => $category,
-                "categoryLabel" => $categoryLabel,
             ]); 
             ?>
 
