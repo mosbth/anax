@@ -251,6 +251,7 @@ class CFileBasedContent
         // Add author details
         $this->meta = $index;
         $this->createAuthor();
+        $this->createCategory();
 
         return $this->meta;
     }
@@ -324,7 +325,9 @@ class CFileBasedContent
                 $acronym = $matches[1];
                 $index[$acronym] = $key;
                 $this->meta[$key]["acronym"] = $acronym;
-                
+                $this->meta[$key]["url"] = $key;
+                unset($this->meta[$key]["__toc__"]);
+
                 // Get content for byline
                 $route = "$key/byline";
                 $data = $this->getDataForAdditionalRoute($route);
@@ -338,7 +341,7 @@ class CFileBasedContent
 
 
     /**
-     * Find next and previous links of current content.
+     * Load details for the author.
      *
      * @param array|string $author with details on the author(s).
      *
@@ -361,12 +364,77 @@ class CFileBasedContent
             if (isset($this->author[$acronym])) {
                 $key = $this->author[$acronym];
                 $authors[$acronym] = $this->meta[$key];
-                unset($authors[$acronym]["__toc__"]);
+            } else {
+                $authors[$acronym]["acronym"] = $acronym;
             }
         }
 
         return $authors;
     }
+
+
+
+    // = Deal with categories ====================================
+    
+    /**
+     * Generate a lookup index for categories that maps into the meta entry
+     * for the category.
+     *
+     * @return void.
+     */
+    private function createCategory()
+    {
+        $pattern = $this->config["category"];
+
+        $index = [];
+        $matches = [];
+        foreach ($this->meta as $key => $entry) {
+            if (preg_match($pattern, $key, $matches)) {
+                $catKey = $matches[1];
+                $index[$catKey] = $key;
+                $this->meta[$key]["key"] = $catKey;
+                $this->meta[$key]["url"] = $key;
+                unset($this->meta[$key]["__toc__"]);
+            }
+        }
+
+        return $index;
+    }
+
+
+
+    /**
+     * Find next and previous links of current content.
+     *
+     * @param array|string $author with details on the category(s).
+     *
+     * @return array with more details on the category(s).
+     */
+    private function loadCategoryDetails($category)
+    {
+        if (is_array($category) && is_array(array_values($category)[0])) {
+            return $category;
+        }
+
+        if (!is_array($category)) {
+            $tmp = $category;
+            $category = [];
+            $category[] = $tmp;
+        }
+
+        $categorys = [];
+        foreach ($category as $catKey) {
+            if (isset($this->category[$catKey])) {
+                $key = $this->category[$catKey];
+                $categorys[$catKey] = $this->meta[$key];
+            } else {
+                $categorys[$catKey]["key"] = $catKey;
+            }
+        }
+
+        return $categorys;
+    }
+
 
 
 
@@ -400,36 +468,6 @@ class CFileBasedContent
         return $filtered->frontmatter;
     }
 
-
-
-    // = Section X to be labeled  ==================================
-
-    /**
-     * Load the content from filtered and parse it step two.
-     *
-     * @param string $file to get content from.
-     *
-     * @return object as filtered content.
-     */
-/*
-    private function loadPureContentPhase2($filtered)
-    {
-        $filter = $this->config["textfilter"];
-        $text = $filtered->text;
-
-        // Get new filtered content
-        $new = $this->di->get("textFilter")->parse($text, $filter);
-        $filtered->text = $new->text;
-
-        // Update all anchor urls to use baseurl, needs info about baseurl
-        // from merged frontmatter
-        //$baseurl = $this->getBaseurl($content["views"]);
-        //$this->addBaseurl2AnchorUrls($filtered, $baseurl);
-
-        return $filtered;
-    }
-
-*/
 
 
     // == Look up route in index ===================================
@@ -566,6 +604,7 @@ class CFileBasedContent
         $this->load("index");
         $this->load("meta");
         $this->load("author");
+        $this->load("category");
         list($routeIndex, $content, $filtered) = $this->mapRoute2Content($route);
 
         // Create and arrange the content as views, merge with .meta,
@@ -687,15 +726,21 @@ class CFileBasedContent
              $filtered->frontmatter = $new->frontmatter;
          }
 
-        // Load details on author if set.
-        if (isset($content["views"]["main"]["data"]["author"])) {
-            $content["views"]["main"]["data"]["author"] = $this->loadAuthorDetails($content["views"]["main"]["data"]["author"]);
-        }
+         // Load details on author, if set.
+         $data = &$content["views"]["main"]["data"];
+         if (isset($data["author"])) {
+             $data["author"] = $this->loadAuthorDetails($data["author"]);
+         }
+
+         // Load details on category, if set.
+         if (isset($data["category"])) {
+             $data["category"] = $this->loadCategoryDetails($data["category"]);
+         }
 
          // Update all anchor urls to use baseurl, needs info about baseurl
          // from merged frontmatter
-         $baseurl = isset($content["views"]["main"]["baseurl"])
-            ? $content["views"]["main"]["baseurl"]
+         $baseurl = isset($data["baseurl"])
+            ? $data["baseurl"]
             : null;
          $this->addBaseurl2AnchorUrls($filtered, $baseurl);
 

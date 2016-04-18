@@ -1,25 +1,33 @@
 <?php
+// Only if set and not empty
+if (!isset($category) || empty($category)) {
+    return;
+}
+
 // Prepare classes
 $classes[] = "meta-footer";
 if (isset($class)) {
     $classes[] = $class;
 }
 
-// Labels
-$categoryLabel = $categoryLabel
-    ? $categoryLabel
-    : t("Category: "); 
+
+
+// Create string for category
+$categoryStr = "";
+foreach ($category as $key => $cat) {
+    $part = isset($cat["name"]) ? $cat["name"] : $key;
+    if (isset($cat["url"])) {
+        $catUrl = $this->url($cat["url"]);
+        $part = "<a href=\"$catUrl\">$part</a>";
+    }
+    $categoryStr .= $part . ", ";
+}
+$categoryStr = substr($categoryStr, 0, -2);
+$categoryStr = t("Category: !CATEGORIES.", ["!CATEGORIES" => $categoryStr]);
 
 
 
 ?>
 <footer <?= $this->classList($classes) ?>>
-    <?php if (isset($category)) : ?>
-        <span><?= $categoryLabel ?></span>
-        <ul>
-            <?php foreach ($category as $name) : ?>
-                <li><a href="#"><?= $name ?></a></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+    <p><?= $categoryStr ?></p>
 </footer>

@@ -5,23 +5,24 @@ if (isset($class)) {
     $classes[] = $class;
 }
 
-// Labels
-$categoryLabel = isset($label["category"])
-    ? $label["category"]
-    : null; 
-
 // Defaults
-$category = isset($category) ? $category : null;
+$category = isset($category) ? $category : [];
 
 
 // Get time for publish/update/create
 list($pubStr, $published) = $this->getPublishedDate(get_defined_vars());
 
 
+
 // Get details on author.
 $authorStr = "";
-foreach ($author as $who) {
-    $authorStr .= "<a rel=\"author\" href=\"/author/${who["acronym"]}\">${who["name"]}</a>, ";
+foreach ($author as $key => $who) {
+    $part = isset($who["name"]) ? $who["name"] : $key;
+    if (isset($who["url"])) {
+        $authorUrl = $this->url($who["url"]);
+        $part = "<a rel=\"author\" href=\"$authorUrl\">$part</a>";
+    }
+    $authorStr .= $part . ", ";
 }
 $authorStr = substr($authorStr, 0, -2);
 $byStr = t("By !AUTHORS.", ["!AUTHORS" => $authorStr]);
@@ -50,7 +51,6 @@ $content = preg_replace("#<h1(.*?)>(.*?)</h1>#", $header, $content, 1);
     <?php 
     $this->renderView("default/blog-meta-footer", [
         "category" => $category,
-        "categoryLabel" => $categoryLabel,
     ]); 
     ?>
 
