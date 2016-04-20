@@ -80,6 +80,11 @@ trait TFBCLoadAdditionalContent
                         $views[$id]["data"]["meta"] = $meta;
                         break;
 
+                    case "book-toc":
+                        $toc = $this->meta[$baseRoute]["__toc__"];
+                        $views[$id]["data"]["toc"] = $toc;
+                        break;
+
                     case "author":
                         if (isset($views["main"]["data"]["author"])) {
                             $views[$id]["data"]["author"] = $this->loadAuthorDetails($views["main"]["data"]["author"]);
@@ -234,6 +239,7 @@ trait TFBCLoadAdditionalContent
             $nextPage = $meta["currentPage"] + 1;
             $meta["nextPageUrl"] = $this->baseRoute . "/$pagination/$nextPage";
         }
+
 
         // Only use slice of toc
         $startSlice = ($meta["currentPage"] - 1) * $options["items"];

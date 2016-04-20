@@ -17,6 +17,10 @@ $pageStr = t("!CURRENT_PAGE (!TOTAL_PAGES)", [
     "!TOTAL_PAGES" => $totalPages,
 ]);
 
+if (!$previousPageUrl && !$nextPageUrl) {
+    return;
+}
+
 
 
 ?><div <?= $this->classList($classes) ?>>
