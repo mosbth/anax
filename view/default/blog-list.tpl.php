@@ -14,7 +14,6 @@ $readmoreLabel = isset($label["readmore"])
 $dateFormat = isset($dateFormat) ? $dateFormat : "m/d/Y";
 
 
-
 ?><section <?= $this->classList($classes) ?>>
     <?php
     // Loop through all items and display
@@ -65,7 +64,10 @@ $dateFormat = isset($dateFormat) ? $dateFormat : "m/d/Y";
     <?php endforeach; ?>
 
     <footer>
-        <hr>
-        <p>Displaying <?= $meta["displayedItems"] ?> out of <?= $meta["totalItems"] ?>.</p>
+        <?php 
+        $this->renderView("default/blog-toc-next-prev-page", [
+            "meta" => $meta,
+        ]); 
+        ?>
     </footer>
 </section>

@@ -10,6 +10,19 @@ $title = isset($title) && !empty($title)
     ? $title
     : t("Current posts");
 
+// Next and previous page
+$nextStr     = t("Next »");
+$previousStr = t("« Previous");
+$nextPageUrl     = $meta["nextPageUrl"];
+$previousPageUrl = $meta["previousPageUrl"];
+$currentPage = $meta["currentPage"];
+$totalPages  = $meta["totalPages"];
+$pageStr = t("!CURRENT_PAGE (!TOTAL_PAGES)", [
+    "!CURRENT_PAGE" => $currentPage,
+    "!TOTAL_PAGES" => $totalPages,
+]);
+
+
 
 ?><div <?= $this->classList($classes) ?>>
 
@@ -22,7 +35,11 @@ $title = isset($title) && !empty($title)
     </ul>
 
     <footer>
-        <p>Displaying <?= $meta["displayedItems"] ?> out of <?= $meta["totalItems"] ?>.</p>
+        <?php 
+        $this->renderView("default/blog-toc-next-prev-page", [
+            "meta" => $meta,
+        ]); 
+        ?>
     </footer>
 
 </div>

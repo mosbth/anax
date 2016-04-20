@@ -36,6 +36,21 @@ class CFileBasedContent
     private $meta = null;
 
     /**
+     * This is the base route.
+     */
+    private $baseRoute = null;
+
+    /**
+     * This is the extendede meta route, if any.
+     */
+    private $metaRoute = null;
+
+    /**
+     * This is the current page, to supply pagination, if used.
+     */
+    private $currentPage = null;
+
+    /**
      * Use cache or recreate each time.
      */
     private $ignoreCache = false;
@@ -464,7 +479,7 @@ class CFileBasedContent
     {
         $basepath = $this->config["basepath"];
         $filter1  = $this->config["textfilter-frontmatter"];
-        $filter2  = $this->config["textfilter"];
+        $filter2  = $this->config["textfilter-title"];
         $filter = array_merge($filter1, $filter2);
         
         $path = $basepath . "/" . $file;
@@ -477,6 +492,38 @@ class CFileBasedContent
 
     // == Look up route in index ===================================
     
+    /**
+     * Check if currrent route is a supported meta route.
+     *
+     * @param string $route current route used to access page.
+     *
+     * @return string as route.
+     */
+    private function checkForMetaRoute($route)
+    {
+        $this->baseRoute = $route;
+        $this->metaRoute = null;
+
+        // If route exits in index, use it
+        if ($this->mapRoute2IndexKey($route)) {
+            return $route;
+        }
+
+        // Check for pagination
+        $pagination = $this->config["pagination"];
+        $matches = [];
+        $pattern = "/(.*?)\/($pagination)\/(\d+)$/";
+        if (preg_match($pattern, $route, $matches)) {
+            $this->baseRoute = $matches[1];
+            $this->metaRoute = $route;
+            $this->currentPage = $matches[3];
+        }
+
+        return $this->baseRoute;
+    }
+
+
+
     /**
      * Map the route to the correct key in the index.
      *
@@ -529,11 +576,10 @@ class CFileBasedContent
      * @param string $route       current route used to access page.
      * @param array  $frontmatter for the content.
      * @param string $key         for the view to retrive.
-     * @param string $distinct    how to merge the array.
      *
      * @return array with data to add as view.
      */
-    private function getView($route, $frontmatter, $key, $distinct = true)
+    private function getView($route, $frontmatter, $key)
     {
         $view = [];
 
@@ -545,11 +591,8 @@ class CFileBasedContent
 
         // From document frontmatter
         if (isset($frontmatter[$key])) {
-            if ($distinct) {
-                $view = array_merge_recursive_distinct($view, $frontmatter[$key]);
-            } else {
-                $view = array_merge($view, $frontmatter[$key]);
-            }
+            $view = array_merge_recursive_distinct($view, $frontmatter[$key]);
+            //$view = array_merge($view, $frontmatter[$key]);
         }
 
         return $view;
@@ -568,7 +611,7 @@ class CFileBasedContent
     private function getViews($route, $frontmatter)
     {
         // Arrange data into views
-        $views = $this->getView($route, $frontmatter, "views", false);
+        $views = $this->getView($route, $frontmatter, "views", true);
 
         // Set defaults
         if (!isset($views["main"]["template"])) {
@@ -610,6 +653,10 @@ class CFileBasedContent
         $this->load("meta");
         $this->load("author");
         $this->load("category");
+        
+        // Match the route
+        $route = rtrim($route, "/");
+        $route = $this->checkForMetaRoute($route);
         list($routeIndex, $content, $filtered) = $this->mapRoute2Content($route);
 
         // Create and arrange the content as views, merge with .meta,

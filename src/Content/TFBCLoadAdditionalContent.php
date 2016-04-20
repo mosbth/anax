@@ -67,10 +67,15 @@ trait TFBCLoadAdditionalContent
                         $views[$id]["data"]["columns"] = $columns;
                         break;
 
+                    case "toc-sort":
+                        $baseRoute = dirname($routeIndex);
+                        $this->orderToc($baseRoute, $meta);
+                        break;
+
                     case "toc":
                         $baseRoute = dirname($routeIndex);
                         $toc = $this->meta[$baseRoute]["__toc__"];
-                        $this->orderAndlimitToc($toc, $meta);
+                        $this->limitToc($toc, $meta);
                         $views[$id]["data"]["toc"] = $toc;
                         $views[$id]["data"]["meta"] = $meta;
                         break;
@@ -79,6 +84,11 @@ trait TFBCLoadAdditionalContent
                         if (isset($views["main"]["data"]["author"])) {
                             $views[$id]["data"]["author"] = $this->loadAuthorDetails($views["main"]["data"]["author"]);
                         }
+                        break;
+
+                    case "copy":
+                        $viewToCopy = $views[$id]["data"]["meta"]["view"];
+                        $views[$id]["data"] = $views[$viewToCopy]["data"];
                         break;
 
                     default:
@@ -145,44 +155,89 @@ trait TFBCLoadAdditionalContent
 
 
     /**
-     * Order and limit toc items.
+     * Order toc items.
      *
-     * @param string &$toc  array with current toc.
-     * @param string &$meta on how to order and limit toc.
+     * @param string $baseRoute route to use to find __toc__.
+     * @param string $meta on how to order toc.
      *
      * @return void.
      */
-    private function orderAndlimitToc(&$toc, &$meta)
+    private function orderToc($baseRoute, $meta)
     {
         $defaults = [
-            "items" => 7,
-            "offset" => 0,
             "orderby" => "section",
             "orderorder" => "asc",
         ];
         $options = array_merge($defaults, $meta);
         $orderby = $options["orderby"];
         $order   = $options["orderorder"];
+        $toc = $this->meta[$baseRoute]["__toc__"];
+        
+        uksort($toc, function ($a, $b) use ($toc, $orderby, $order) {
+                $a = $toc[$a][$orderby];
+                $b = $toc[$b][$orderby];
+
+                $asc = $order == "asc" ? 1 : -1;
+                
+                if ($a == $b) {
+                    return 0;
+                } elseif ($a > $b) {
+                    return $asc;
+                }
+                return -$asc;
+        });
+        
+        $this->meta[$baseRoute]["__toc__"] = $toc;
+    }
+
+
+    /**
+     * Limit and paginate toc items.
+     *
+     * @param string &$toc  array with current toc.
+     * @param string &$meta on how to order and limit toc.
+     *
+     * @return void.
+     */
+    private function limitToc(&$toc, &$meta)
+    {
+        $defaults = [
+            "items" => 7,
+            "offset" => 0,
+        ];
+        $options = array_merge($defaults, $meta);
+
+        // Check if pagination is currently used
+        if ($this->currentPage) {
+            $options["offset"] = ($this->currentPage - 1) * $options["items"];
+        }
 
         $meta["totalItems"] = count($toc);
+        $meta["currentPage"] = (int) floor($options["offset"] / $options["items"]) + 1;
+        $meta["totalPages"] = (int) floor($meta["totalItems"] / $options["items"] + 1);
 
-        // TODO support pagination by adding entries to $meta
-
-        uksort($toc, function ($a, $b) use ($toc, $orderby, $order) {
-            $a = $toc[$a][$orderby];
-            $b = $toc[$b][$orderby];
-
-            $asc = $order == "asc" ? 1 : -1;
-            
-            if ($a == $b) {
-                return 0;
-            } elseif ($a > $b) {
-                return $asc;
+        // Next and previous page
+        $pagination = $this->config["pagination"];
+        $meta["nextPageUrl"] = null;
+        $meta["previousPageUrl"] = null;
+        
+        if ($meta["currentPage"] > 1 && $meta["totalPages"] > 1) {
+            $previousPage = $meta["currentPage"] - 1;
+            $previous = "";
+            if ($previousPage != 1) {
+                $previous = "/$pagination/$previousPage";
             }
-            return -$asc;
-        });
+            $meta["previousPageUrl"] = $this->baseRoute . $previous;
+        }
 
-        $toc = array_slice($toc, $options["offset"], $options["items"]);
+        if ($meta["currentPage"] < $meta["totalPages"]) {
+            $nextPage = $meta["currentPage"] + 1;
+            $meta["nextPageUrl"] = $this->baseRoute . "/$pagination/$nextPage";
+        }
+
+        // Only use slice of toc
+        $startSlice = ($meta["currentPage"] - 1) * $options["items"];
+        $toc = array_slice($toc, $startSlice, $options["items"]);
         $meta["displayedItems"] = count($toc);
     }
 }
