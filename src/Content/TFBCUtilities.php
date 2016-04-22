@@ -9,6 +9,25 @@ namespace Anax\Content;
 trait TFBCUtilities
 {
     /**
+     * Support relative routes.
+     *
+     * @param string $route      to load.
+     * @param string $routeIndex to use.
+     *
+     * @return string with active route.
+     */
+    private function getActiveRoute($route, $routeIndex)
+    {
+        if (substr_compare($route, "./", 0, 2) === 0) {
+            $route = dirname($routeIndex) . "/" . substr($route, 2);
+        }
+
+        return $route;
+    }
+
+
+
+    /**
      * Load view data for additional route, merged with meta if any.
      *
      * @param string $route to load.
@@ -42,7 +61,6 @@ trait TFBCUtilities
         $data["content"] = $new->text;
 
         return $data;
-
     }
 
 

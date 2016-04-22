@@ -47,11 +47,7 @@ trait TFBCLoadAdditionalContent
 
                     case "single": // OBSOLETE
                     case "content":
-                        // Support relative routes
-                        $route = $meta["route"];
-                        if (substr_compare($route, "./", 0, 2) === 0) {
-                            $route = dirname($routeIndex) . "/" . substr($route, 2);
-                        }
+                        $route = $this->getActiveRoute($meta["route"], $routeIndex);
 
                         // Get the content
                         $data = $this->getDataForAdditionalRoute($route);
@@ -61,7 +57,8 @@ trait TFBCLoadAdditionalContent
                     case "columns":
                         $columns = $meta["columns"];
                         foreach ($columns as $key => $value) {
-                            $data = $this->getDataForAdditionalRoute($value["route"]);
+                            $route = $this->getActiveRoute($value["route"], $routeIndex);
+                            $data = $this->getDataForAdditionalRoute($route);
                             $columns[$key] = $data;
                         }
                         $views[$id]["data"]["columns"] = $columns;

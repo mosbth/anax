@@ -14,7 +14,7 @@ $classes = isset($classes) ? $classes : null;
 <?php endif; ?>
 
 <?php $i = 1; foreach ($columns as $column) : ?>
-    <div <?= $this->classList("$outerClass") ?>>
+    <div <?= $this->classList("column $outerClass") ?>>
 
         <?php 
         $column["classes"] = ["$outerClass-x", "$outerClass-$i"];

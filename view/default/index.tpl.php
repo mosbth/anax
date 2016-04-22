@@ -126,6 +126,19 @@ $class .= empty($class) ? "" : "has-sidebar";
 
 
 
+<!-- columns-below -->
+<?php if ($this->regionHasContent("columns-below")) : ?>
+<div class="outer-wrap-columns-below">
+    <div class="inner-wrap-columns-below">
+        <div class="columns-below">
+            <?php $this->renderRegion("columns-below")?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+
+
 <!-- sitefooter -->
 <?php if ($this->regionHasContent("footer")) : ?>
 <div class="outer-wrap-footer" role="contentinfo">
