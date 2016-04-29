@@ -14,6 +14,7 @@ $readmoreLabel = isset($label["readmore"])
 $dateFormat = isset($dateFormat) ? $dateFormat : "m/d/Y";
 
 
+
 ?><section <?= $this->classList($classes) ?>>
     <?php
     // Loop through all items and display

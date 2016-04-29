@@ -351,7 +351,8 @@ class CFileBasedContent
                 // Get content for byline
                 $route = "$key/byline";
                 $data = $this->getDataForAdditionalRoute($route);
-                $this->meta[$key]["byline"] = $data["content"];
+                $byline = isset($data["content"]) ? $data["content"] : null;
+                $this->meta[$key]["byline"] = $byline;
             }
         }
 
@@ -770,24 +771,26 @@ class CFileBasedContent
          }
 
          // Get new filtered content (and updated frontmatter)
+         // Title in frontmatter overwrites title found in content
          $new = $textFilter->parse($text, $filter);
          $filtered->text = $new->text;
-         if ($filtered->frontmatter) {
-             $filtered->frontmatter = array_merge_recursive_distinct($filtered->frontmatter, $new->frontmatter);
-         } else {
-             $filtered->frontmatter = $new->frontmatter;
-         }
+         
+         // Keep title if defined in frontmatter
+         $title = isset($filtered->frontmatter["title"])
+            ? $filtered->frontmatter["title"]
+            : null;
 
-         // Load details on author, if set.
+         $filtered->frontmatter = array_merge_recursive_distinct(
+            $filtered->frontmatter,
+            $new->frontmatter
+        );
+
+        if ($title) {
+            $filtered->frontmatter["title"] = $title;
+        }
+
+         // Main data is
          $data = &$content["views"]["main"]["data"];
-         if (isset($data["author"])) {
-             $data["author"] = $this->loadAuthorDetails($data["author"]);
-         }
-
-         // Load details on category, if set.
-         if (isset($data["category"])) {
-             $data["category"] = $this->loadCategoryDetails($data["category"]);
-         }
 
          // Update all anchor urls to use baseurl, needs info about baseurl
          // from merged frontmatter
@@ -798,6 +801,16 @@ class CFileBasedContent
 
          // Add excerpt and hasMore, if available
          $textFilter->addExcerpt($filtered);
+
+         // Load details on author, if set.
+         if (isset($data["author"])) {
+             $data["author"] = $this->loadAuthorDetails($data["author"]);
+         }
+
+         // Load details on category, if set.
+         if (isset($data["category"])) {
+             $data["category"] = $this->loadCategoryDetails($data["category"]);
+         }
     }
 
 

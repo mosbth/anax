@@ -1,4 +1,9 @@
 <?php
+/**
+ * OBSOLETE?, this view may be partly merged with default/block.
+ * Its the next-prev part that is different.
+ */
+
 // Prepare classes
 $classes[] = "block blog-toc";
 if (isset($class)) {
@@ -9,18 +14,6 @@ if (isset($class)) {
 $title = isset($title) && !empty($title)
     ? $title
     : t("Current posts");
-
-// Next and previous page
-$nextStr     = t("Next »");
-$previousStr = t("« Previous");
-$nextPageUrl     = $meta["nextPageUrl"];
-$previousPageUrl = $meta["previousPageUrl"];
-$currentPage = $meta["currentPage"];
-$totalPages  = $meta["totalPages"];
-$pageStr = t("!CURRENT_PAGE (!TOTAL_PAGES)", [
-    "!CURRENT_PAGE" => $currentPage,
-    "!TOTAL_PAGES" => $totalPages,
-]);
 
 
 

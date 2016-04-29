@@ -28,6 +28,85 @@ trait TFBCUtilities
 
 
     /**
+     * Process content phase 2 and merge with new frontmatter into
+     * view structure.
+     *
+     * @param string &$views array to load view info into.
+     * @param string  $route to load meta from.
+     *
+     * @return void
+     */
+    private function processContentPhaseTwo(&$filtered)
+    {
+        $filter     = $this->config["textfilter"];
+        $textFilter = $this->di->get("textFilter");
+
+        // Get new filtered content (and updated frontmatter)
+        $new = $textFilter->parse($filtered->text, $filter);
+        $filtered->text = $new->text;
+        $filtered->frontmatter = array_merge_recursive_distinct(
+            $filtered->frontmatter,
+            $new->frontmatter
+        );
+
+        // Update all anchor urls to use baseurl, needs info about baseurl
+        // from merged frontmatter
+        $baseurl = isset($filtered->frontmatter["baseurl"])
+           ? $filtered->frontmatter["baseurl"]
+           : null;
+        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
+
+        // Add excerpt and hasMore, if available
+        $textFilter->addExcerpt($filtered);
+    }
+
+
+
+
+    /**
+     * Load view details for additional route, merged with meta if any.
+     *
+     * @param string $route to load.
+     *
+     * @return array with view data details.
+     */
+    private function loadAndParseRoute($route)
+    {
+         // Get meta into view structure
+         $meta = $this->getMetaForRoute($route);
+         unset($meta["__toc__"]);
+         unset($meta["views"]);
+
+        // Get filtered content from route
+        list($routeIndex, , $filtered) =
+            $this->mapRoute2Content($route);
+
+        // Merge frontmatter with meta
+        // then merge frontmatter base into views main
+        $filtered->frontmatter = array_merge_recursive_distinct(
+            $meta,
+            $filtered->frontmatter
+        );
+
+        // Do phase 2 processing to get new filtered content
+        // (and updated frontmatter)
+        $this->processContentPhaseTwo($filtered);
+
+        // Create complete frontmatter, inluding content
+        $filtered->frontmatter["data"]["content"] = isset($filtered->text)
+            ? $filtered->text
+            : null;
+
+        // Load additional content for view, based on data-meta
+        $view = ["main" => $filtered->frontmatter];
+        $this->loadAdditionalContent($view, $route, $routeIndex);
+
+        return $view["main"];
+    }
+
+
+
+    /**
      * Load view data for additional route, merged with meta if any.
      *
      * @param string $route to load.
@@ -36,31 +115,38 @@ trait TFBCUtilities
      */
     private function getDataForAdditionalRoute($route)
     {
-        // From configuration
-         $filter = $this->config["textfilter"];
+         $filter     = $this->config["textfilter"];
+         $textFilter = $this->di->get("textFilter");
 
         // Get filtered content from route
-        list(, , $filtered) =
+        list($routeIndex, , $filtered) =
             $this->mapRoute2Content($route);
 
-        // Set data to be content of frontmatter, merged with meta
+        // Get meta, remove unneeded details
         $meta = $this->getMetaForRoute($route);
-        $data = $filtered->frontmatter;
-        $data = array_merge_recursive_distinct($meta, $data);
-        unset($data["__toc__"]);
-        unset($data["views"]);
+        unset($meta["__toc__"]);
+        unset($meta["views"]);
 
-        // Do phase 2 processing
-        $new = $this->di->get("textFilter")->parse($filtered->text, $filter);
-        
+        // Do phase 2 processing to get new filtered content
+        // (and updated frontmatter)
+        $new = $textFilter->parse($filtered->text, $filter);
+        $new->frontmatter = array_merge_recursive_distinct($filtered->frontmatter, $new->frontmatter);
+
         // Creates urls based on baseurl
-        $baseurl = isset($data["baseurl"])
-            ? isset($data["baseurl"])
+        $baseurl = isset($new->frontmatter["data"]["baseurl"])
+            ? isset($new->frontmatter["data"]["baseurl"])
             : null;
         $this->addBaseurl2AnchorUrls($new, $baseurl);
-        $data["content"] = $new->text;
 
-        return $data;
+        // Create complete frontmatter, inluding content
+        $frontmatter = $new->frontmatter;
+        $frontmatter["data"]["content"] = $new->text;
+//var_dump($frontmatter);
+        // Load additional content for view, based on data-meta
+        $view = ["main" => $frontmatter];
+        $this->loadAdditionalContent($view, $route, $routeIndex);
+
+        return $view["main"];
     }
 
 

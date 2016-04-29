@@ -13,12 +13,20 @@ $classes = isset($classes) ? $classes : null;
     <h2><?= $title ?></h2>
 <?php endif; ?>
 
-<?php $i = 1; foreach ($columns as $column) : ?>
+
+<?php $i = 1; foreach ($columns as $column) : 
+    $template = isset($column["template"])
+        ? $column["template"]
+        : "default/block";
+?>
     <div <?= $this->classList("column $outerClass") ?>>
 
         <?php 
         $column["classes"] = ["$outerClass-x", "$outerClass-$i"];
-        $this->renderView("default/block", $column);
+        $data = isset($column["data"])
+            ? $column["data"]
+            : $column;
+        $this->renderView($template, $data);
          ?>
 
     </div>

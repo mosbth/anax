@@ -42,7 +42,6 @@ trait TFBCBreadcrumb
     private function getBreadcrumbTitle($file)
     {
         $frontmatter = $this->getFrontmatter($file);
-
         $title = $frontmatter["title"];
         if (isset($frontmatter["titleBreadcrumb"])) {
             $title = $frontmatter["titleBreadcrumb"];

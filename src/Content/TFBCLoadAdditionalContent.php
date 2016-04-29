@@ -49,17 +49,28 @@ trait TFBCLoadAdditionalContent
                     case "content":
                         $route = $this->getActiveRoute($meta["route"], $routeIndex);
 
-                        // Get the content
-                        $data = $this->getDataForAdditionalRoute($route);
-                        $views[$id]["data"] = array_merge_recursive_distinct($views[$id]["data"], $data);
+                        // Load and parse route as view. Load meta view
+                        // if any.
+                        // Current view details preceds the loaded once.
+                        $view = $this->loadAndParseRoute($route);
+                        $views[$id] = array_merge_recursive_distinct($view, $views[$id]);
                         break;
 
                     case "columns":
+                        // Each column is an own view set with details
+                        // Process as meta view and load additional content
+                        $template = isset($meta["template"])
+                            ? $meta["template"]
+                            : null;
                         $columns = $meta["columns"];
-                        foreach ($columns as $key => $value) {
-                            $route = $this->getActiveRoute($value["route"], $routeIndex);
-                            $data = $this->getDataForAdditionalRoute($route);
-                            $columns[$key] = $data;
+                        foreach ($columns as $key => $view) {
+                            $views2 = [ "main" => $view ];
+                            $this->loadAdditionalContent($views2, $route, $routeIndex);
+                            $columns[$key] = $views2["main"];
+                            
+                            if ($template) {
+                                $columns[$key]["template"] = $template;
+                            }
                         }
                         $views[$id]["data"]["columns"] = $columns;
                         break;
@@ -73,6 +84,25 @@ trait TFBCLoadAdditionalContent
                         $baseRoute = dirname($routeIndex);
                         $toc = $this->meta[$baseRoute]["__toc__"];
                         $this->limitToc($toc, $meta);
+                        $views[$id]["data"]["toc"] = $toc;
+                        $views[$id]["data"]["meta"] = $meta;
+                        break;
+
+                    case "toc-route":
+                        // Get the toc for a specific route
+                        $route = $this->getActiveRoute($meta["route"], $routeIndex);
+                        $routeIndex2 = $this->mapRoute2IndexKey($route);
+                        $baseRoute = dirname($routeIndex2);
+
+                        // Include support for ordering
+                        if (isset($meta["orderby"])
+                            || isset($meta["orderorder"])) {
+                            $this->orderToc($baseRoute, $meta);
+                        }
+
+                        // Same as toc
+                        $toc = $this->meta[$baseRoute]["__toc__"];
+                        $this->limitToc($toc, $meta, $baseRoute);
                         $views[$id]["data"]["toc"] = $toc;
                         $views[$id]["data"]["meta"] = $meta;
                         break;
@@ -196,12 +226,13 @@ trait TFBCLoadAdditionalContent
     /**
      * Limit and paginate toc items.
      *
-     * @param string &$toc  array with current toc.
-     * @param string &$meta on how to order and limit toc.
+     * @param string &$toc      array with current toc.
+     * @param string &$meta     on how to order and limit toc.
+     * @param string $baseRoute prepend to next & previous urls.
      *
      * @return void.
      */
-    private function limitToc(&$toc, &$meta)
+    private function limitToc(&$toc, &$meta, $baseRoute = null)
     {
         $defaults = [
             "items" => 7,
@@ -222,19 +253,22 @@ trait TFBCLoadAdditionalContent
         $pagination = $this->config["pagination"];
         $meta["nextPageUrl"] = null;
         $meta["previousPageUrl"] = null;
-        
+        $baseRoute = isset($baseRoute)
+            ? $baseRoute
+            : $this->baseRoute;
+
         if ($meta["currentPage"] > 1 && $meta["totalPages"] > 1) {
             $previousPage = $meta["currentPage"] - 1;
             $previous = "";
             if ($previousPage != 1) {
-                $previous = "/$pagination/$previousPage";
+                $previous = "$pagination/$previousPage";
             }
-            $meta["previousPageUrl"] = $this->baseRoute . $previous;
+            $meta["previousPageUrl"] = "$baseRoute/$previous";
         }
 
         if ($meta["currentPage"] < $meta["totalPages"]) {
             $nextPage = $meta["currentPage"] + 1;
-            $meta["nextPageUrl"] = $this->baseRoute . "/$pagination/$nextPage";
+            $meta["nextPageUrl"] = "$baseRoute/$pagination/$nextPage";
         }
 
 

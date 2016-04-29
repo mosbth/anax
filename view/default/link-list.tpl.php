@@ -1,7 +1,20 @@
 <?php 
-$class = isset($class) ? $class : null;
-?><ul <?= $this->classList($class) ?>>
-    <?php foreach ($links as $link) : ?>
-    <li><a href="<?= $this->url($link["url"]) ?>"><?= $link["text"] ?></a></li>
+/**
+ * Renders a ul li view based on a general links array.
+ */
+
+
+
+?><ul>
+
+    <?php foreach ($links as $link) : 
+        $url  = $this->url($link["url"]);
+        $text = $link["text"];
+        $title = isset($link["title"])
+            ? " title=\"${link["title"]}\""
+            : null;
+    ?>
+    <li><a href="<?= $url ?>"<?= $title ?>><?= $text ?></a></li>
     <?php endforeach; ?>
+
 </ul>

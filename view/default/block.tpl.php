@@ -10,6 +10,8 @@ if (isset($contentRoute)) {
     extract($this->getContentForRoute($contentRoute));
 }
 
+//var_dump(get_defined_vars());
+
 // Prepare title
 $title = isset($title) && !empty($title)? $title : null;
 $header = isset($header) ? $header : $title; 
@@ -17,6 +19,8 @@ $header = isset($header) ? $header : $title;
 // Prepare content into text
 $content = isset($content) ? $content : null;
 $text = isset($text) ? $text : $content;
+
+
 
 ?><div <?= $this->classList($classes) ?>>
 
@@ -28,9 +32,15 @@ $text = isset($text) ? $text : $content;
         <?= $text ?>
     <?php endif; ?>
 
-    <?php if (isset($links)) : 
+    <?php if (isset($links)) :
         $this->renderView("default/link-list", [
             "links" => $links
+        ]); 
+    endif; ?>
+
+    <?php if (isset($toc)) :
+        $this->renderView("default/toc-list", [
+            "toc" => $toc
         ]); 
     endif; ?>
 
