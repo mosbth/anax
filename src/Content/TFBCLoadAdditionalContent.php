@@ -120,7 +120,10 @@ trait TFBCLoadAdditionalContent
 
                     case "copy":
                         $viewToCopy = $views[$id]["data"]["meta"]["view"];
-                        $views[$id]["data"] = $views[$viewToCopy]["data"];
+                        $views[$id]["data"] = array_merge_recursive_distinct(
+                            $views[$viewToCopy]["data"],
+                            $views[$id]["data"]
+                        );
                         break;
 
                     default:
@@ -204,7 +207,7 @@ trait TFBCLoadAdditionalContent
         $orderby = $options["orderby"];
         $order   = $options["orderorder"];
         $toc = $this->meta[$baseRoute]["__toc__"];
-        
+
         uksort($toc, function ($a, $b) use ($toc, $orderby, $order) {
                 $a = $toc[$a][$orderby];
                 $b = $toc[$b][$orderby];
