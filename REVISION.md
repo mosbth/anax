@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.1 (2016-05-09)
+
+* Several edits and cleanups for Anax Flat and building flat websites with Anax.
+
+
 v2.5.0 (2015-09-02)
 
 * Merged Anax MVC changes.
