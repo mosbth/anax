@@ -29,5 +29,10 @@
     },
     "suggest": {
         "ext-yaml": "*"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.5.x-dev"
+        }
     }
 }
