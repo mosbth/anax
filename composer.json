@@ -26,9 +26,8 @@
     },
     "require": {
         "php": ">=5.6",
-        "mos/cimage": "@dev",
-        "mos/ctextfilter": "dev-master",
-        "geshi/geshi": "dev-master",
-        "mos/cform": "2.x-dev"
+    },
+    "suggest": {
+        "ext-yaml": "*"
     }
 }
