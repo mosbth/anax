@@ -39,7 +39,6 @@ class CView implements \Anax\DI\IInjectionAware
     public function set($template, $data = [], $sort = 0, $type = "file")
     {
         if (is_array($template)) {
-
             if (isset($template["callback"])) {
                 $type = "callback";
                 $this->template = $template;

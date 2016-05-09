@@ -153,7 +153,6 @@ class CRouterBasic implements \Anax\DI\IInjectionAware
 
             // No route was matched
             $this->handleInternal('404');
-        
         } catch (\Exception $e) {
             // Exception codes can match a route for a http status code
             $code = $e->getCode();
@@ -161,7 +160,6 @@ class CRouterBasic implements \Anax\DI\IInjectionAware
             if (in_array($code, $statusCodes)) {
                 $this->di->flash->setMessage($e->getMessage());
                 $this->handleInternal($code);
-            
             } else {
                 throw $e;
             }

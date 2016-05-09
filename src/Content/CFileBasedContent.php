@@ -467,7 +467,7 @@ class CFileBasedContent
     // Title is retrieved from the HTML code.
     // Also do cacheing of each retrieved and parsed document
     // in this cycle, to gather code that loads and parses a individual
-    // document. 
+    // document.
     
     /**
      * Get the frontmatter of a document.
@@ -564,7 +564,10 @@ class CFileBasedContent
             return [$routeIndex, $this->index[$routeIndex]];
         }
 
-        throw new \Anax\Exception\NotFoundException(t("The route '!ROUTE' does not exists in the index.", ["!ROUTE" => $route]));
+        $msg = t("The route '!ROUTE' does not exists in the index.", [
+            "!ROUTE" => $route
+        ]);
+        throw new \Anax\Exception\NotFoundException($msg);
     }
 
 
@@ -748,39 +751,39 @@ class CFileBasedContent
      *
      * @return array with content and filtered version.
      */
-     private function processMainContentPhaseTwo(&$content, &$filtered)
-     {
+    private function processMainContentPhaseTwo(&$content, &$filtered)
+    {
         // From configuration
-         $filter = $this->config["textfilter"];
-         $revisionStart = $this->config["revision-history"]["start"];
-         $revisionEnd   = $this->config["revision-history"]["end"];
-         $revisionClass = $this->config["revision-history"]["class"];
+        $filter = $this->config["textfilter"];
+        $revisionStart = $this->config["revision-history"]["start"];
+        $revisionEnd   = $this->config["revision-history"]["end"];
+        $revisionClass = $this->config["revision-history"]["class"];
          
-         $textFilter = $this->di->get("textFilter");
-         $text = $filtered->text;
+        $textFilter = $this->di->get("textFilter");
+        $text = $filtered->text;
 
-         // Check if revision history is to be included
-         if (isset($content["views"]["main"]["data"]["revision"])) {
-             $text = $textFilter->addRevisionHistory(
-                 $text,
-                 $content["views"]["main"]["data"]["revision"],
-                 $revisionStart,
-                 $revisionEnd,
-                 $revisionClass
-             );
-         }
+        // Check if revision history is to be included
+        if (isset($content["views"]["main"]["data"]["revision"])) {
+            $text = $textFilter->addRevisionHistory(
+                $text,
+                $content["views"]["main"]["data"]["revision"],
+                $revisionStart,
+                $revisionEnd,
+                $revisionClass
+            );
+        }
 
-         // Get new filtered content (and updated frontmatter)
-         // Title in frontmatter overwrites title found in content
-         $new = $textFilter->parse($text, $filter);
-         $filtered->text = $new->text;
+        // Get new filtered content (and updated frontmatter)
+        // Title in frontmatter overwrites title found in content
+        $new = $textFilter->parse($text, $filter);
+        $filtered->text = $new->text;
          
-         // Keep title if defined in frontmatter
-         $title = isset($filtered->frontmatter["title"])
-            ? $filtered->frontmatter["title"]
-            : null;
+        // Keep title if defined in frontmatter
+        $title = isset($filtered->frontmatter["title"])
+          ? $filtered->frontmatter["title"]
+          : null;
 
-         $filtered->frontmatter = array_merge_recursive_distinct(
+        $filtered->frontmatter = array_merge_recursive_distinct(
             $filtered->frontmatter,
             $new->frontmatter
         );
@@ -789,28 +792,28 @@ class CFileBasedContent
             $filtered->frontmatter["title"] = $title;
         }
 
-         // Main data is
-         $data = &$content["views"]["main"]["data"];
+        // Main data is
+        $data = &$content["views"]["main"]["data"];
 
-         // Update all anchor urls to use baseurl, needs info about baseurl
-         // from merged frontmatter
-         $baseurl = isset($data["baseurl"])
-            ? $data["baseurl"]
-            : null;
-         $this->addBaseurl2AnchorUrls($filtered, $baseurl);
+        // Update all anchor urls to use baseurl, needs info about baseurl
+        // from merged frontmatter
+        $baseurl = isset($data["baseurl"])
+          ? $data["baseurl"]
+          : null;
+        $this->addBaseurl2AnchorUrls($filtered, $baseurl);
 
-         // Add excerpt and hasMore, if available
-         $textFilter->addExcerpt($filtered);
+        // Add excerpt and hasMore, if available
+        $textFilter->addExcerpt($filtered);
 
-         // Load details on author, if set.
-         if (isset($data["author"])) {
-             $data["author"] = $this->loadAuthorDetails($data["author"]);
-         }
+        // Load details on author, if set.
+        if (isset($data["author"])) {
+            $data["author"] = $this->loadAuthorDetails($data["author"]);
+        }
 
-         // Load details on category, if set.
-         if (isset($data["category"])) {
-             $data["category"] = $this->loadCategoryDetails($data["category"]);
-         }
+        // Load details on category, if set.
+        if (isset($data["category"])) {
+            $data["category"] = $this->loadCategoryDetails($data["category"]);
+        }
     }
 
 

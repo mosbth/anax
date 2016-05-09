@@ -51,7 +51,6 @@ trait TInjectable
         try {
             $this->$service = $this->di->get($service);
             return $this->$service;
-
         } catch (\Exception $e) {
             throw new \Exception(
                 'In trait TInjectable used by class ' . __CLASS__ . '. You are trying to get
@@ -86,7 +85,6 @@ trait TInjectable
         try {
             $this->$service = $this->di->get($service);
             return $this->$service;
-
         } catch (\Exception $e) {
             throw new \Exception(
                 'In trait TInjectable used by class ' . __CLASS__ . '. You are trying to get a

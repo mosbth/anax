@@ -213,15 +213,12 @@ class CDI implements IDI
                     . $e->getMessage()
                 );
             }
-
         } elseif (is_object($sol)) {
             // Load by pre-instantiated object
             $this->active[$service] = $sol;
-
         } elseif (is_string($sol)) {
             // Load by creating a new object from class-string
             $this->active[$service] = new $sol();
-
         } else {
             throw new Exception("CDI could not load service '$service'. It is unknown how to load it.");
         }

@@ -3,7 +3,7 @@
 namespace Anax\Content;
 
 /**
- * File Based Content, code for loading additional content into view through 
+ * File Based Content, code for loading additional content into view through
  * data["meta"].
  */
 trait TFBCUtilities

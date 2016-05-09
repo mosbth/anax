@@ -46,28 +46,23 @@ class CUrl
                 . (($this->urlType == self::URL_APPEND)
                     ? "/$this->scriptName"
                     : null);
-
         } elseif (empty($uri)) {
             // Empty uri means baseurl with appended $baseuri
             ;
-
         } elseif (substr($uri, 0, 7) == "http://"
             || substr($uri, 0, 8) == "https://"
             || substr($uri, 0, 2) == "//"
         ) {
             // Fully qualified, just leave as is.
             return rtrim($uri, "/");
-
         } elseif ($uri[0] == "/") {
             // Absolute url, prepend with siteUrl
             return rtrim($this->siteUrl . rtrim($uri, '/'), '/');
-
         } elseif ($uri[0] == "#"
             || $uri[0] == "?"
         ) {
             // Hashtag url to local page, or query part, leave as is.
             return $uri;
-
         }
 
         // Prepend uri with baseuri
@@ -103,15 +98,12 @@ class CUrl
         if (empty($uri)) {
             // Empty uri means baseurl
             return $this->baseUrl;
-
         } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
-
         } elseif ($uri[0] == '/') {
             // Absolute url, prepend with siteUrl
             return rtrim($this->siteUrl . rtrim($uri, '/'), '/');
-
         }
 
         $uri = rtrim($uri, '/');
@@ -131,15 +123,12 @@ class CUrl
     {
         if (empty($uri)) {
             // Allow empty
-
         } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
-
         } elseif ($uri[0] == '/') {
             // Absolute url, prepend with staticSiteUrl
             return rtrim($this->staticSiteUrl . rtrim($uri, '/'), '/');
-
         }
 
         $baseUrl = isset($this->staticBaseUrl) ? $this->staticBaseUrl : $this->baseUrl;
@@ -252,7 +241,7 @@ class CUrl
      *
      * @return str the formatted slug.
      */
-    function slugify($str)
+    public function slugify($str)
     {
         $str = mb_strtolower(trim($str));
         $str = str_replace(array('å','ä','ö'), array('a','a','o'), $str);

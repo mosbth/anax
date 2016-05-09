@@ -194,9 +194,9 @@ trait THelpers
             return [t("Latest revision"), key($dates["revision"])];
         } elseif ($dates["published"]) {
             return [t("Published"), $dates["published"]];
-        } elseif($dates["updated"]) {
+        } elseif ($dates["updated"]) {
             return [t("Updated"), $dates["updated"]];
-        } elseif($dates["created"]) {
+        } elseif ($dates["created"]) {
             return [t("Created"), $dates["created"]];
         }
 

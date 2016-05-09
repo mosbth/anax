@@ -3,7 +3,7 @@
 namespace Anax\Content;
 
 /**
- * File Based Content, code for loading additional content into view through 
+ * File Based Content, code for loading additional content into view through
  * data["meta"].
  */
 trait TFBCLoadAdditionalContent
@@ -127,7 +127,10 @@ trait TFBCLoadAdditionalContent
                         break;
 
                     default:
-                        throw new Exception(t("Unsupported data/meta/type '!TYPE' for additional content.", ["!TYPE" => $meta["type"]]));
+                        $msg = t("Unsupported data/meta/type '!TYPE' for additional content.", [
+                            "!TYPE" => $meta["type"]
+                        ]);
+                        throw new Exception($msg);
                 }
             }
         }
@@ -214,11 +217,11 @@ trait TFBCLoadAdditionalContent
 
                 $asc = $order == "asc" ? 1 : -1;
                 
-                if ($a == $b) {
-                    return 0;
-                } elseif ($a > $b) {
-                    return $asc;
-                }
+            if ($a == $b) {
+                return 0;
+            } elseif ($a > $b) {
+                return $asc;
+            }
                 return -$asc;
         });
         
