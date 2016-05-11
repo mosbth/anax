@@ -56,12 +56,13 @@ class CDIFactoryDefault extends CDI
 
         $this->setShared("url", function () {
             $url = new \Anax\Url\CUrl();
+            $url->configure("url.php");
             $url->setSiteUrl($this->request->getSiteUrl());
             $url->setBaseUrl($this->request->getBaseUrl());
             $url->setStaticSiteUrl($this->request->getSiteUrl());
             $url->setStaticBaseUrl($this->request->getBaseUrl());
             $url->setScriptName($this->request->getScriptName());
-            $url->setUrlType($url::URL_APPEND);
+            $url->setDefaultsFromConfiguration();
             return $url;
         });
 

@@ -8,6 +8,9 @@ namespace Anax\Url;
  */
 class CUrl
 {
+    use \Anax\TConfigure;
+
+
 
     /**
      * Properties
@@ -25,6 +28,35 @@ class CUrl
 
     private $staticSiteUrl = null; // Siteurl to prepend to all absolute urls for assets
     private $staticBaseUrl = null; // Baseurl to prepend to all relative urls for assets
+
+
+
+    /**
+     * Set default values from configuration.
+     *
+     * @return this.
+     */
+    public function setDefaultsFromConfiguration()
+    {
+        $set = [
+            "urlType",
+            "siteUrl",
+            "baseUrl",
+            "staticSiteUrl",
+            "staticBaseUrl",
+            "scriptName",
+        ];
+        
+        foreach ($set as $item) {
+            if (!isset($this->config[$item])) {
+                continue;
+            }
+            
+            $this->$item = $this->config[$item];
+        }
+
+        return $this;
+    }
 
 
 
