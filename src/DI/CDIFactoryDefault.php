@@ -98,7 +98,9 @@ class CDIFactoryDefault extends CDI
             
             $router = new \Anax\Route\CRouterBasic();
             $router->setDI($this);
+            $this->loadFile("routes.php");
 
+/*
             $router->addInternal("403", function () {
                 $this->dispatcher->forward([
                     "controller" => "error",
@@ -135,7 +137,7 @@ class CDIFactoryDefault extends CDI
                     ],
                 ]);
             })->setName("500");
-            
+            */
             return $router;
         });
 
@@ -189,12 +191,6 @@ class CDIFactoryDefault extends CDI
             return $content;
         });
 
-        $this->setShared("textFilter", function () {
-            //$filter = new \Anax\Content\CTextFilter();
-            $filter = new \Mos\TextFilter\CTextFilter();
-            //$filter->setDI($this);
-            //$filter->configure(ANAX_APP_PATH . "/config/text_filter.php");
-            return $filter;
-        });
+        $this->setShared("textFilter", "\Mos\TextFilter\CTextFilter");
     }
 }

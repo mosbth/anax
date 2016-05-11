@@ -1,12 +1,12 @@
 <?php
 
-namespace Anax\Kernel;
+namespace Anax\App;
 
 /**
  * Anax base class for an application.
  *
  */
-class CAnax
+class CAnaxDefault
 {
     use \Anax\DI\TInjectable;
 
