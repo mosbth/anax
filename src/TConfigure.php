@@ -20,7 +20,7 @@ trait TConfigure
 
     /**
      * Read configuration from file or array, if a file, first check in
-     * ANAX_INSTALL PATH/config and then in ANAX_APP_PATH/config.
+     * ANAX_APP_PATH/config and then in ANAX_INSTALL_PATH/config.
      *
      * @param array/string $what is an array with key/value config options
      *                           or a file to be included which returns such

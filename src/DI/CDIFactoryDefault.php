@@ -8,30 +8,7 @@ namespace Anax\DI;
  */
 class CDIFactoryDefault extends CDI
 {
-    /**
-     * Load config file from ANAX_APP_PATH or ANAX_INSTALL_PATH.
-     *
-     * @param string $filename to load.
-     *
-     * @throws Exception when $filenam is not found.
-     *
-     * @return void
-     */
-    public function loadFile($filename)
-    {
-        $pathInstall = ANAX_INSTALL_PATH . "/config/$filename";
-        $pathApp = ANAX_APP_PATH . "/config/$filename";
-        
-        if (is_readable($pathApp)) {
-            require $pathApp;
-            return;
-        } elseif (is_readable($pathInstall)) {
-            require $pathInstall;
-            return;
-        }
-
-        throw new Exception("Configure item '$filename' is not a readable file.");
-    }
+    use \Anax\TLoadFile;
 
 
 
@@ -48,7 +25,8 @@ class CDIFactoryDefault extends CDI
         $this->setShared("response", "\Anax\Response\CResponseBasic");
         $this->setShared("validate", "\Anax\Validate\CValidate");
         $this->setShared("flash", "\Anax\Flash\CFlashBasic");
-        
+        $this->setShared("textFilter", "\Mos\TextFilter\CTextFilter");
+
         $this->set("route", "\Anax\Route\CRouteBasic");
         $this->set("view", "\Anax\View\CView");
 
@@ -98,46 +76,6 @@ class CDIFactoryDefault extends CDI
             
             $router = new \Anax\Route\CRouterBasic();
             $router->setDI($this);
-            $this->loadFile("routes.php");
-
-/*
-            $router->addInternal("403", function () {
-                $this->dispatcher->forward([
-                    "controller" => "error",
-                    "action" => "statusCode",
-                    "params" => [
-                        "code" => 403,
-                        "message" => "HTTP Status Code 403: This is a forbidden route.",
-                    ],
-                ]);
-            })->setName("403");
-            
-            $router->addInternal("404", function () {
-                $this->dispatcher->forward([
-                    "controller" => "error",
-                    "action" => "statusCode",
-                    "params" => [
-                        "code" => 404,
-                        "message" => "HTTP Status Code 404: This route is not found.",
-                    ],
-                ]);
-                $this->dispatcher->forward([
-                    "controller" => "error",
-                    "action" => "displayValidRoutes",
-                ]);
-            })->setName("404");
-            
-            $router->addInternal("500", function () {
-                $this->dispatcher->forward([
-                    "controller" => "error",
-                    "action" => "statusCode",
-                    "params" => [
-                        "code" => 500,
-                        "message" => "HTTP Status Code 500: There was an internal server or processing error.",
-                    ],
-                ]);
-            })->setName("500");
-            */
             return $router;
         });
 
@@ -190,7 +128,5 @@ class CDIFactoryDefault extends CDI
             $content->setDefaultsFromConfiguration();
             return $content;
         });
-
-        $this->setShared("textFilter", "\Mos\TextFilter\CTextFilter");
     }
 }
