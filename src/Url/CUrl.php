@@ -118,10 +118,12 @@ class CUrl
 
 
     /**
-     * Create an url and prepend the baseUrl to the directory of the frontcontroller.
+     * Create an url and prepend the baseUrl to the directory of
+     * the frontcontroller.
      *
-     * @param string $uri part of uri to use when creating an url. "" or null means baseurl to
-     * directory of the current frontcontroller.
+     * @param string $uri part of uri to use when creating an url.
+     *                    "" or null means baseurl to directory of
+     *                    the current frontcontroller.
      *
      * @return string as resulting url.
      */
@@ -130,7 +132,10 @@ class CUrl
         if (empty($uri)) {
             // Empty uri means baseurl
             return $this->baseUrl;
-        } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
+        } elseif (substr($uri, 0, 7) == "http://"
+            || substr($uri, 0, 8) == "https://"
+            || substr($uri, 0, 2) == "//"
+        ) {
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
         } elseif ($uri[0] == '/') {
@@ -155,7 +160,10 @@ class CUrl
     {
         if (empty($uri)) {
             // Allow empty
-        } elseif (substr($uri, 0, 7) == "http://" || substr($uri, 0, 2) == "//") {
+        } elseif (substr($uri, 0, 7) == "http://"
+            || substr($uri, 0, 8) == "https://"
+            || substr($uri, 0, 2) == "//"
+        ) {
             // Fully qualified, just leave as is.
             return rtrim($uri, '/');
         } elseif ($uri[0] == '/') {
@@ -163,7 +171,9 @@ class CUrl
             return rtrim($this->staticSiteUrl . rtrim($uri, '/'), '/');
         }
 
-        $baseUrl = isset($this->staticBaseUrl) ? $this->staticBaseUrl : $this->baseUrl;
+        $baseUrl = isset($this->staticBaseUrl)
+            ? $this->staticBaseUrl
+            : $this->baseUrl;
 
         return empty($uri)
             ? $baseUrl

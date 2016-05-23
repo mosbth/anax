@@ -55,10 +55,28 @@ class CUrlTest extends \PHPUnit_Framework_TestCase
     {
         $url = new \Anax\Url\CUrl();
 
+        // create
         $res = $url->setSiteUrl($siteUrl);
         $this->assertInstanceOf(get_class($url), $res, "setSiteUrl did not return this.");
 
-        $res = $url->create($route);
+        $res = $url->createRelative($route);
+        $this->assertEquals($result, $res, "Created url did not match expected.");
+
+        // createRelative
+        $res = $url->setBaseUrl($siteUrl);
+        $this->assertInstanceOf(get_class($url), $res, "setBaseUrl did not return this.");
+
+        $res = $url->createRelative($route);
+        $this->assertEquals($result, $res, "Created url did not match expected.");
+
+        // asset
+        $res = $url->setStaticSiteUrl($siteUrl);
+        $this->assertInstanceOf(get_class($url), $res, "setStaticSiteUrl did not return this.");
+
+        $res = $url->setStaticBaseUrl($siteUrl);
+        $this->assertInstanceOf(get_class($url), $res, "setStaticBaseUrl did not return this.");
+
+        $res = $url->asset($route);
         $this->assertEquals($result, $res, "Created url did not match expected.");
     }
 

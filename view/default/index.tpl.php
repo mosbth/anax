@@ -23,7 +23,7 @@
 <body <?= $this->classList($bodyClass, $currentRoute) ?>>
 
 <!-- wrapper around all items on page -->
-<div class="wrapp-all">
+<div class="wrap-all">
 
 
 
