@@ -6,9 +6,15 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.3 (2016-06-22)
+
+* Update index view for design course kmom02 and new grid.
+
+
 v2.5.2 (2016-06-08)
 
 * Several edits and cleanups for Anax Flat and building flat websites with Anax.
+
 
 v2.5.1 (2016-05-09)
 
