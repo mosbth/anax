@@ -29,11 +29,13 @@
 
 <!-- siteheader -->
 <?php if ($this->regionHasContent("header")) : ?>
-<div class="outer-wrap-header">
-    <div class="inner-wrap-header">
-        <header class="site-header" role="banner">
-            <?php $this->renderRegion("header") ?>
-        </header>
+<div class="outer-wrap outer-wrap-header">
+    <div class="inner-wrap inner-wrap-header">
+        <div class="row">
+            <header class="site-header" role="banner">
+                <?php $this->renderRegion("header") ?>
+            </header>
+        </div>
     </div>
 </div>
 <?php endif; ?>
@@ -42,11 +44,13 @@
 
 <!-- navbar -->
 <?php if ($this->regionHasContent("navbar1")) : ?>
-<div class="outer-wrap-navbar">
-    <div class="inner-wrap-navbar">
-        <nav class="navbar1" role="navigation">
-            <?php $this->renderRegion("navbar1")?>
-        </nav>
+<div class="outer-wrap outer-wrap-navbar">
+    <div class="inner-wrap inner-wrap-navbar">
+        <div class="row">
+            <nav class="navbar1" role="navigation">
+                <?php $this->renderRegion("navbar1")?>
+            </nav>
+        </div>
     </div>
 </div>
 <?php endif; ?>
@@ -55,11 +59,13 @@
 
 <!-- breadcrumb -->
 <?php if ($this->regionHasContent("breadcrumb")) : ?>
-<div class="outer-wrap-breadcrumb">
-    <div class="inner-wrap-breadcrumb">
-        <nav class="breadcrumb" role="navigation">
-            <?php $this->renderRegion("breadcrumb")?>
-        </nav>
+<div class="outer-wrap outer-wrap-breadcrumb">
+    <div class="inner-wrap inner-wrap-breadcrumb">
+        <div class="row">
+            <nav class="breadcrumb" role="navigation">
+                <?php $this->renderRegion("breadcrumb")?>
+            </nav>
+        </div>
     </div>
 </div>
 <?php endif; ?>
@@ -68,9 +74,13 @@
 
 <!-- flash -->
 <?php if ($this->regionHasContent("flash")) : ?>
-<div class="outer-wrap-flash">
-    <div class="inner-wrap-flash">
-        <?php $this->renderRegion("flash")?>
+<div class="outer-wrap outer-wrap-flash">
+    <div class="inner-wrap inner-wrap-flash">
+        <div class="row">
+            <div class="flash">
+                <?php $this->renderRegion("flash")?>
+            </div>
+        </div>
     </div>
 </div>
 <?php endif; ?>
@@ -79,10 +89,12 @@
 
 <!-- columns-above -->
 <?php if ($this->regionHasContent("columns-above")) : ?>
-<div class="outer-wrap-columns-above">
-    <div class="inner-wrap-columns-above">
-        <div class="columns-above">
-            <?php $this->renderRegion("columns-above")?>
+<div class="outer-wrap outer-wrap-columns-above">
+    <div class="inner-wrap inner-wrap-columns-above">
+        <div class="row">
+            <div class="columns-above">
+                <?php $this->renderRegion("columns-above")?>
+            </div>
         </div>
     </div>
 </div>
@@ -91,8 +103,9 @@
 
 
 <!-- main -->
-<div class="outer-wrap-main">
-    <div class="inner-wrap-main">
+<div class="outer-wrap outer-wrap-main">
+    <div class="inner-wrap inner-wrap-main">
+        <div class="row">
 
 <?php
 $sidebarLeft  = $this->regionHasContent("sidebar-left");
@@ -103,35 +116,38 @@ $class .= $sidebarRight ? "has-sidebar-right " : "";
 $class .= empty($class) ? "" : "has-sidebar";
 ?>
 
-        <?php if ($sidebarLeft): ?>
-        <div class="sidebar sidebar-left <?= $class ?>" role="complementary">
-            <?php $this->renderRegion("sidebar-left")?>
+            <?php if ($sidebarLeft): ?>
+            <div class="sidebar sidebar-left <?= $class ?>" role="complementary">
+                <?php $this->renderRegion("sidebar-left")?>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($this->regionHasContent("main")): ?>
+            <main class="main <?= $class ?>" role="main">
+                <?php $this->renderRegion("main")?>
+            </main>
+            <?php endif; ?>
+
+            <?php if ($sidebarRight): ?>
+            <div class="sidebar sidebar-right <?= $class ?>" role="complementary">
+                <?php $this->renderRegion("sidebar-right")?>
+            </div>
+            <?php endif; ?>
+
         </div>
-        <?php endif; ?>
-
-        <?php if ($this->regionHasContent("main")): ?>
-        <main class="main <?= $class ?>" role="main">
-            <?php $this->renderRegion("main")?>
-        </main>
-        <?php endif; ?>
-
-        <?php if ($sidebarRight): ?>
-        <div class="sidebar sidebar-right <?= $class ?>" role="complementary">
-            <?php $this->renderRegion("sidebar-right")?>
-        </div>
-        <?php endif; ?>
-
-  </div>
+    </div>
 </div>
 
 
 
 <!-- columns-below -->
 <?php if ($this->regionHasContent("columns-below")) : ?>
-<div class="outer-wrap-columns-below">
-    <div class="inner-wrap-columns-below">
-        <div class="columns-below">
-            <?php $this->renderRegion("columns-below")?>
+<div class="outer-wrap outer-wrap-columns-below">
+    <div class="inner-wrap inner-wrap-columns-below">
+        <div class="row">
+            <div class="columns-below">
+                <?php $this->renderRegion("columns-below")?>
+            </div>
         </div>
     </div>
 </div>
@@ -141,9 +157,13 @@ $class .= empty($class) ? "" : "has-sidebar";
 
 <!-- sitefooter -->
 <?php if ($this->regionHasContent("footer")) : ?>
-<div class="outer-wrap-footer" role="contentinfo">
-    <div class="inner-wrap-footer">
-        <?php $this->renderRegion("footer")?>
+<div class="outer-wrap outer-wrap-footer" role="contentinfo">
+    <div class="inner-wrap inner-wrap-footer">
+        <div class="row">
+            <div class="footer">
+                <?php $this->renderRegion("footer")?>
+            </div>
+        </div>
     </div>
 </div>
 <?php endif; ?>

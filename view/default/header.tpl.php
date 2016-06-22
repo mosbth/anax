@@ -13,7 +13,7 @@
         <span class="site-logo-text-icon" >
             <img src="<?= $this->asset($siteLogoTextIcon) ?>" alt="<?= $siteLogoTextIconAlt ?>">
         </span>
-        <?php endif; ?>        
+        <?php endif; ?>
         <?= $siteLogoText ?>
     </a>
 </span>
