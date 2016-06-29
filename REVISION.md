@@ -64,7 +64,7 @@ v2.0.3 (2015-01-12)
 v2.0.2 (2014-10-25)
 
 * Added example for navigation bar and how to create urls in navbar.
-* Add default route handler for route defined as '\*'.
+* Add default route handler for route defined as '*'.
 * Added empryt directory for app-specific file content `app/content`.
 * Minor fixes to error messages.
 * Several minor fixes to code formatting.
@@ -136,5 +136,5 @@ v1.0.0 (2013-06-28)
 
 ```
  .  
-..:  Copyright (c) 2013 - 2016 Mikael Roos, mos@dbwebb.se
+..:  Copyright (c) 2013 - 2015 Mikael Roos, mos@dbwebb.se
 ```

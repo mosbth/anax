@@ -57,21 +57,6 @@
 
 
 
-<!-- breadcrumb -->
-<?php if ($this->regionHasContent("breadcrumb")) : ?>
-<div class="outer-wrap outer-wrap-breadcrumb">
-    <div class="inner-wrap inner-wrap-breadcrumb">
-        <div class="row">
-            <nav class="breadcrumb" role="navigation">
-                <?php $this->renderRegion("breadcrumb")?>
-            </nav>
-        </div>
-    </div>
-</div>
-<?php endif; ?>
-
-
-
 <!-- flash -->
 <?php if ($this->regionHasContent("flash")) : ?>
 <div class="outer-wrap outer-wrap-flash">
@@ -80,6 +65,21 @@
             <div class="flash">
                 <?php $this->renderRegion("flash")?>
             </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+
+
+<!-- breadcrumb -->
+<?php if ($this->regionHasContent("breadcrumb")) : ?>
+<div class="outer-wrap outer-wrap-breadcrumb">
+    <div class="inner-wrap inner-wrap-breadcrumb">
+        <div class="row">
+            <nav class="breadcrumb-list" role="navigation">
+                <?php $this->renderRegion("breadcrumb")?>
+            </nav>
         </div>
     </div>
 </div>

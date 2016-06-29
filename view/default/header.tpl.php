@@ -29,6 +29,10 @@
     <?php $this->renderRegion("search") ?>
 <?php endif; ?>
 
+<?php if ($this->regionHasContent("profile")) : ?>
+    <?php $this->renderRegion("profile") ?>
+<?php endif; ?>
+
 <?php if (isset($siteTitle)) : ?>
 <span class="site-title"><?= $siteTitle ?></span>
 <?php endif; ?>
