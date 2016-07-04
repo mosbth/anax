@@ -30,13 +30,7 @@
 <?php endif; ?>
 
 <?php if ($this->regionHasContent("profile")) : ?>
+<div class="profile">
     <?php $this->renderRegion("profile") ?>
-<?php endif; ?>
-
-<?php if (isset($siteTitle)) : ?>
-<span class="site-title"><?= $siteTitle ?></span>
-<?php endif; ?>
-
-<?php if (isset($siteSlogan)) : ?>
-<span class="site-slogan"><?= $siteSlogan ?></span>
+</div>
 <?php endif; ?>

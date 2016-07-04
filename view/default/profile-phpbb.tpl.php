@@ -6,13 +6,12 @@ $gravatarHome  = "//www.gravatar.com/$gravatar";
 $gravatarImage = "//www.gravatar.com/avatar/$gravatar?r=pg&amp;s=40&amp;d=wavatar";
 
 
- ?><div class="profile">
-    <p>
+ ?><span class="profile-phpbb">
     <?php if ($is_anonymous) : ?>
         <span class="login">
             <a href="/forum/ucp.php?mode=login">
                 <span class="text">Login</span>
-                <i class="icon fa fa-sign-in fa-2x"></i>
+                <i class="icon fa fa-sign-in"></i>
             </a>
         </span>
 
@@ -26,5 +25,4 @@ $gravatarImage = "//www.gravatar.com/avatar/$gravatar?r=pg&amp;s=40&amp;d=wavata
 
         <span class="gravatar"><a href="/forum/ucp.php"><img src="<?= $gravatarImage ?>" alt=""></a></span>
     <?php endif; ?>
-    </p>
-</div>
+</span>

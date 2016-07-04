@@ -6,9 +6,9 @@ Revision history
 History for Anax
 -----------------------------------
 
-v2.5.4 (2016-06-29)
+v2.5.5 (2016-07-04)
 
-* Integrate with addon for phpbb.
+* Added menu..
 
 
 v2.5.3 (2016-06-22)
@@ -69,7 +69,7 @@ v2.0.3 (2015-01-12)
 v2.0.2 (2014-10-25)
 
 * Added example for navigation bar and how to create urls in navbar.
-* Add default route handler for route defined as '\*'.
+* Add default route handler for route defined as '*'.
 * Added empryt directory for app-specific file content `app/content`.
 * Minor fixes to error messages.
 * Several minor fixes to code formatting.

@@ -62,7 +62,7 @@
 <div class="outer-wrap outer-wrap-flash">
     <div class="inner-wrap inner-wrap-flash">
         <div class="row">
-            <div class="flash">
+            <div class="flash-wrap">
                 <?php $this->renderRegion("flash")?>
             </div>
         </div>
@@ -77,9 +77,11 @@
 <div class="outer-wrap outer-wrap-breadcrumb">
     <div class="inner-wrap inner-wrap-breadcrumb">
         <div class="row">
-            <nav class="breadcrumb-list" role="navigation">
-                <?php $this->renderRegion("breadcrumb")?>
-            </nav>
+            <div class="breadcrumb-wrap">
+                <nav class="breadcrumb-list" role="navigation">
+                    <?php $this->renderRegion("breadcrumb")?>
+                </nav>
+            </div>
         </div>
     </div>
 </div>
