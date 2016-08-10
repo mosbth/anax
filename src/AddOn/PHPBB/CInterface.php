@@ -18,6 +18,16 @@ class CInterface {
     function getSessionDetails($path) {
         global $phpbb_root_path, $phpEx, $user, $db, $config, $cache, $template, $auth;
 
+        // Enable to work even if forum is not available
+        if (!is_dir($path)) {
+            return [
+                'is_anonymous'  => "No one",
+                'user_acronym'  => "NoOne",
+                'user_email'    => "noone@dbwebb.se",
+                'session_id'    => null,
+            ];
+        }
+
         define('IN_PHPBB', true);
         $phpbb_root_path = (defined('PHPBB_ROOT_PATH')) ? PHPBB_ROOT_PATH : $path;
         $phpEx = "php"; //substr(strrchr(__FILE__, '.'), 1);
@@ -28,12 +38,12 @@ class CInterface {
         $auth->acl($user->data);
         $user->setup();
 
-        return array(
+        return [
             'is_anonymous'  => ($user->data['user_id'] == ANONYMOUS),
             'user_acronym'  => $user->data['username_clean'],
             'user_email'    => $user->data['user_email'],
             'session_id'    => $user->data['session_id'],
-        );
+        ];
     }
 
 

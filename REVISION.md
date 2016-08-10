@@ -8,7 +8,7 @@ History for Anax
 
 v2.5.5 (2016-07-04)
 
-* Added menu..
+* Added menu.
 
 
 v2.5.3 (2016-06-22)
