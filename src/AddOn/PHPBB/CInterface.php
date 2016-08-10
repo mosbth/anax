@@ -19,7 +19,7 @@ class CInterface {
         global $phpbb_root_path, $phpEx, $user, $db, $config, $cache, $template, $auth;
 
         // Enable to work even if forum is not available
-        if (!is_dir($path)) {
+        if (!is_file("$path/webb.config")) {
             return [
                 'is_anonymous'  => "No one",
                 'user_acronym'  => "NoOne",

@@ -6,6 +6,16 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.7 (2016-08-10)
+
+* Fix. Enable to work withouth reference to phpbb forum.
+
+
+v2.5.6 (2016-08-10)
+
+* Enable to work withouth reference to phpbb forum.
+
+
 v2.5.5 (2016-07-04)
 
 * Added menu.
