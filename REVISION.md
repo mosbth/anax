@@ -6,6 +6,12 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.8 (2016-08-11)
+
+* New empty template added.
+* Added region for content after-main.
+
+
 v2.5.7 (2016-08-10)
 
 * Fix. Enable to work withouth reference to phpbb forum.

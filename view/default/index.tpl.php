@@ -142,6 +142,21 @@ $class .= empty($class) ? "" : "has-sidebar";
 
 
 
+<!-- after-main -->
+<?php if ($this->regionHasContent("after-main")) : ?>
+<div class="outer-wrap outer-wrap-after-main">
+    <div class="inner-wrap inner-wrap-after-main">
+        <div class="row">
+            <div class="after-main">
+                <?php $this->renderRegion("after-main")?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
+
+
 <!-- columns-below -->
 <?php if ($this->regionHasContent("columns-below")) : ?>
 <div class="outer-wrap outer-wrap-columns-below">
