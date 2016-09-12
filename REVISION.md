@@ -6,6 +6,12 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.11 (2016-09-12)
+
+* Add `CThemeEngine::appendToVariable()`.
+* Add `CSession::delete()` and `CSession::readOnce()`.
+
+
 v2.5.10 (2016-09-12)
 
 * Add info to default config for `config/content.php`.
