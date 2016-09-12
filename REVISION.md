@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.9 (2016-09-12)
+
+* Add empty `config/routes/custom.php` to make it easy for users to add new routes.
+
+
 v2.5.8 (2016-08-11)
 
 * New empty template added.

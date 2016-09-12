@@ -4,9 +4,10 @@ namespace Anax\AddOn\PHPBB;
 
 /**
  * Create a interface for PHPBB.
- * 
+ *
  */
-class CInterface {
+class CInterface
+{
 
     /**
      * Sample function to integrate with a phpbb installation and lend some
@@ -15,7 +16,8 @@ class CInterface {
      * @param string $path is the install path of PHPBB.
      * @return array with details of user.
      */
-    function getSessionDetails($path) {
+    public function getSessionDetails($path)
+    {
         global $phpbb_root_path, $phpEx, $user, $db, $config, $cache, $template, $auth;
 
         // Enable to work even if forum is not available
@@ -79,9 +81,19 @@ class CInterface {
     foreach($topics as $t) {
       // Get folder img, topic status/type related information
       //$topic_tracking_info = get_complete_topic_tracking($t['forum_id'], $t['topic_id']);
-      //$unread_topic = (isset($topic_tracking_info[$t['topic_id']]) && $t['topic_last_post_time'] > $topic_tracking_info[$t['topic_id']]) ? true : false;
+      //$unread_topic = (isset($topic_tracking_info[$t['topic_id']]) && $t['topic_last_post_time'] > $topic_tracking_info[$t['topic_id']])
+        ? true
+        : false;
       //topic_status($t, $t['topic_replies'], $unread_topic, $folder_img, $folder_alt, $topic_type);
-      // href = $phpbb_root_path . 'viewtopic.php?f=' . $t['forum_id'] . '&amp;t=' . $t['topic_id'] . '&amp;p=' . $t['topic_last_post_id'] . '#p' . $t['topic_last_post_id'];
+      // href = $phpbb_root_path
+        . 'viewtopic.php?f='
+        . $t['forum_id']
+        . '&amp;t='
+        . $t['topic_id']
+        . '&amp;p='
+        . $t['topic_last_post_id']
+        . '#p'
+        . $t['topic_last_post_id'];
       $item['forum_id'] = $t['forum_id'];
       $item['topic_id'] = $t['topic_id'];
       $item['topic_last_post_id'] = $t['topic_last_post_id'];

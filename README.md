@@ -33,5 +33,5 @@ This software is free software and carries a MIT license.
 
 ```
  .  
-..:  Copyright (c) 2013 - 2015 Mikael Roos, mos@dbwebb.se
+..:  Copyright (c) 2013 - 2016 Mikael Roos, mos@dbwebb.se
 ```
