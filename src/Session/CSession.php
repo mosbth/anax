@@ -13,18 +13,6 @@ class CSession
 
 
     /**
-     * Construct session.
-     *
-     * @param array $options to configure options.
-     */
-    public function __construct($options = [])
-    {
-        ;
-    }
-
-
-
-    /**
      * Set a session name or use one from config.
      *
      * @param array $aName to set as session name, default is null and then use name from config.
@@ -46,7 +34,7 @@ class CSession
      *
      * @param array $options to configure options.
      */
-    public function start($options = [])
+    public function start()
     {
         session_start();
     }
@@ -86,6 +74,20 @@ class CSession
 
 
     /**
+     * Unset part of session.
+     *
+     * @param string $key in session variable.
+     *
+     * @return void
+     */
+    public function delete($key)
+    {
+        unset($_SESSION[$key]);
+    }
+
+
+
+    /**
      * Check if a value is set in the session.
      *
      * @param string $key   in session variable.
@@ -95,5 +97,22 @@ class CSession
     public function has($key)
     {
         return isset($_SESSION[$key]);
+    }
+
+
+
+    /**
+     * Read a value from the session and unset it, a form of read once flash
+     * memory using the session.
+     *
+     * @param string $key in session variable.
+     *
+     * @return mixed value from session and null if not set.
+     */
+    public function readOnce($key)
+    {
+        $read = $this->get($key);
+        $this->delete($key);
+        return $read;
     }
 }
