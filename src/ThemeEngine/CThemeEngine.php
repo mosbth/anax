@@ -88,6 +88,22 @@ class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
 
 
     /**
+     * Append value to variable by making the variable an array.
+     *
+     * @param string $which variable to set value of.
+     * @param mixed  $value of the variable.
+     *
+     * @return $this
+     */
+    public function appendToVariable($which, $value)
+    {
+        $this->data[$which][] = $value;
+        return $this;
+    }
+
+
+
+    /**
      * Add frontmatter to be exposed to theme template file.
      *
      * @param array|null $matter to add.
@@ -172,7 +188,7 @@ class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
             "currentRoute" => "route-" . str_replace("/", "-", $this->di->get("request")->getRoute()),
         ];
         $view = $this->config["view"];
-        $view["data"] = array_merge($defaultData, $this->data, $view["data"]);
+        $view["data"] = array_merge_recursive($defaultData, $this->data, $view["data"]);
 
         if (isset($this->template)) {
             $view["template"] = $this->template;
