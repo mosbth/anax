@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.12 (2016-10-14)
+
+* Fix that author is displayed.
+
+
 v2.5.11 (2016-09-12)
 
 * Add `CThemeEngine::appendToVariable()`.

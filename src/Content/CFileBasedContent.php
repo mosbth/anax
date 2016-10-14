@@ -351,7 +351,7 @@ class CFileBasedContent
                 // Get content for byline
                 $route = "$key/byline";
                 $data = $this->getDataForAdditionalRoute($route);
-                $byline = isset($data["content"]) ? $data["content"] : null;
+                $byline = isset($data["data"]["content"]) ? $data["data"]["content"] : null;
                 $this->meta[$key]["byline"] = $byline;
             }
         }
