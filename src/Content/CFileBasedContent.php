@@ -801,6 +801,7 @@ class CFileBasedContent
           ? $data["baseurl"]
           : null;
         $this->addBaseurl2AnchorUrls($filtered, $baseurl);
+        $this->addBaseurl2ImageSource($filtered, $baseurl);
 
         // Add excerpt and hasMore, if available
         $textFilter->addExcerpt($filtered);

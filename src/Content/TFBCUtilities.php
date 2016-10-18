@@ -55,6 +55,7 @@ trait TFBCUtilities
            ? $filtered->frontmatter["baseurl"]
            : null;
         $this->addBaseurl2AnchorUrls($filtered, $baseurl);
+        $this->addBaseurl2ImageSource($filtered, $baseurl);
 
         // Add excerpt and hasMore, if available
         $textFilter->addExcerpt($filtered);
@@ -137,11 +138,12 @@ trait TFBCUtilities
             ? isset($new->frontmatter["data"]["baseurl"])
             : null;
         $this->addBaseurl2AnchorUrls($new, $baseurl);
+        $this->addBaseurl2ImageSource($new, $baseurl);
 
         // Create complete frontmatter, inluding content
         $frontmatter = $new->frontmatter;
         $frontmatter["data"]["content"] = $new->text;
-//var_dump($frontmatter);
+
         // Load additional content for view, based on data-meta
         $view = ["main" => $frontmatter];
         $this->loadAdditionalContent($view, $route, $routeIndex);
@@ -171,6 +173,30 @@ trait TFBCUtilities
 
         $filtered->text =
             $textf->addBaseurlToRelativeLinks($filtered->text, $baseurl, $callback);
+    }
+
+
+
+    /**
+     * Parse text, find and update all image source to use baseurl.
+     *
+     * @param object &$filtered with text and excerpt to process.
+     * @param string $baseurl   add as baseurl for all relative urls.
+     *
+     * @return void.
+     */
+    private function addBaseurl2ImageSource(&$filtered, $baseurl)
+    {
+        $textf  = $this->di->get("textFilter");
+        $url    = $this->di->get("url");
+
+        // Use callback to url->create() instead of string concat
+        $callback = function ($route) use ($url, $baseurl) {
+            return $url->create($route, $baseurl);
+        };
+
+        $filtered->text =
+            $textf->addBaseurlToImageSource($filtered->text, $baseurl, $callback);
     }
 
 
