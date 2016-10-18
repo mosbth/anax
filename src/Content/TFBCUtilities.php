@@ -192,7 +192,7 @@ trait TFBCUtilities
 
         // Use callback to url->create() instead of string concat
         $callback = function ($route) use ($url, $baseurl) {
-            return $url->create($route, $baseurl);
+            return $url->asset($route, $baseurl);
         };
 
         $filtered->text =
