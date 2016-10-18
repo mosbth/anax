@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.14 (2016-10-18)
+
+* Add baseurl to relative image sources.
+
+
 v2.5.13 (2016-10-18)
 
 * Fix `mailto:` links.
