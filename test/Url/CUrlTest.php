@@ -167,6 +167,14 @@ class CUrlTest extends \PHPUnit_Framework_TestCase
                 "controller/action/arg1/arg2",
                 "$baseUrl/$scriptName/controller/action/arg1/arg2",
             ],
+            [
+                $siteUrl,
+                $baseUrl,
+                $scriptName,
+                $urlType,
+                "mailto:user@example.com",
+                "mailto:user@example.com",
+            ],
         ];
     }
 

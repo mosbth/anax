@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.13 (2016-10-18)
+
+* Fix `mailto:` links.
+
+
 v2.5.12 (2016-10-14)
 
 * Fix that author is displayed.
