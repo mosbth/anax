@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.17 (2016-10-18)
+
+* Fix mailto link using Markdown.
+
+
 v2.5.16 (2016-10-18)
 
 * Fix baseurl to relative image sources, use `asset()` to create url.
