@@ -159,6 +159,8 @@ class CRequestBasic
         $scriptPath = dirname($scriptName);
         $scriptFile = basename($scriptName);
 
+        $requestUri = urldecode($requestUri);
+
         // Compare REQUEST_URI and SCRIPT_NAME as long they match,
         // leave the rest as current request.
         $i = 0;

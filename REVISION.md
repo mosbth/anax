@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.18 (2016-10-31)
+
+* Fix incoming url that has encoded characters.
+
+
 v2.5.17 (2016-10-18)
 
 * Fix mailto link using Markdown.
