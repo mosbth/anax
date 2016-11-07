@@ -168,6 +168,10 @@ trait TFBCUtilities
 
         // Use callback to url->create() instead of string concat
         $callback = function ($route) use ($url, $baseurl) {
+            if (!empty($route) && $route[0] == "!") {
+                echo $route . "<br>";
+                return $url->asset(substr($route, 1), $baseurl);
+            }
             return $url->create($route, $baseurl);
         };
 
