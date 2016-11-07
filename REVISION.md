@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.20 (2016-11-07)
+
+* Cleanup debug info for urls with `!`.
+
+
 v2.5.19 (2016-11-07)
 
 * Treat relative urls, in documents in folder `content`, as assets when they are started with a `!`.
