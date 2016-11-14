@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.22 (2016-11-14)
+
+* Add backlink to content source in revision history.
+
+
 v2.5.21 (2016-11-14)
 
 * Correct theme engine to use added stylesheets and js.

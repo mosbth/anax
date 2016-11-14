@@ -758,7 +758,10 @@ class CFileBasedContent
         $revisionStart = $this->config["revision-history"]["start"];
         $revisionEnd   = $this->config["revision-history"]["end"];
         $revisionClass = $this->config["revision-history"]["class"];
-         
+        $revisionSource = isset($this->config["revision-history"]["source"])
+            ? $this->config["revision-history"]["source"]
+            : null;
+
         $textFilter = $this->di->get("textFilter");
         $text = $filtered->text;
 
@@ -769,7 +772,8 @@ class CFileBasedContent
                 $content["views"]["main"]["data"]["revision"],
                 $revisionStart,
                 $revisionEnd,
-                $revisionClass
+                $revisionClass,
+                $revisionSource . "/" . $content["file"]
             );
         }
 
