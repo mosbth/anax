@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.21 (2016-11-14)
+
+* Correct theme engine to use added stylesheets and js.
+
+
 v2.5.20 (2016-11-07)
 
 * Cleanup debug info for urls with `!`.

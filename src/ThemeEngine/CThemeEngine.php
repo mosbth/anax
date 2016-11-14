@@ -188,6 +188,10 @@ class CThemeEngine implements IThemeEngine, \Anax\DI\IInjectionAware
             "currentRoute" => "route-" . str_replace("/", "-", $this->di->get("request")->getRoute()),
         ];
         $view = $this->config["view"];
+
+        if (isset($this->config["data"])) {
+            $view["data"] = array_merge_recursive($view["data"], $this->config["data"]);
+        }
         $view["data"] = array_merge_recursive($defaultData, $this->data, $view["data"]);
 
         if (isset($this->template)) {
