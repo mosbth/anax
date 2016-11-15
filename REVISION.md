@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.23 (2016-11-15)
+
+* Rework CThemeEngine to configure theme selector.
+
+
 v2.5.22 (2016-11-14)
 
 * Add backlink to content source in revision history.
