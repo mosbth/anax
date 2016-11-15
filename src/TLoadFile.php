@@ -14,7 +14,7 @@ trait TLoadFile
      *
      * @param string $filename to load.
      * @param array  $expose   array with variables to expose to included file,
-     *                         defaults to en empty array.
+     *                         defaults to an empty array.
      *
      * @throws Exception when $filename is not found.
      *
