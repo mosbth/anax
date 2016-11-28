@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.24 (2016-11-28)
+
+* Add method `CRequest::hasGet()`.
+
+
 v2.5.23 (2016-11-15)
 
 * Rework CThemeEngine to configure theme selector.

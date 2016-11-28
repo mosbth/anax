@@ -284,6 +284,20 @@ class CRequestBasic
 
 
     /**
+     * Check if s value is defined in the _GET array.
+     *
+     * @param string $key     to check if it exists in the $_GET variable
+     *
+     * @return boolean
+     */
+    public function hasGet($key)
+    {
+        return isset($this->get[$key]);
+    }
+
+
+
+    /**
      * Set variable in the get array.
      *
      * @param mixed  $key   the key an the , or an key-value array
