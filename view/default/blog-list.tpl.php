@@ -35,7 +35,7 @@ $dateFormat = isset($dateFormat) ? $dateFormat : "m/d/Y";
         // Format the content
         $urlToPost = $this->url($route);
         $excerpt = $item["excerpt"];
-        
+
         // Wrap h1 with link to article
         $excerpt = $this->wrapElementContentWithStartEnd(
             $excerpt,
@@ -55,20 +55,20 @@ $dateFormat = isset($dateFormat) ? $dateFormat : "m/d/Y";
             
             <p class="readmore"><a href="<?= $urlToPost ?>"><?= $readmoreLabel ?></a></p>
 
-            <?php 
+            <?php
             $this->renderView("default/blog-meta-footer", [
                 "category" => $category,
-            ]); 
+            ]);
             ?>
 
         </section>
     <?php endforeach; ?>
 
     <footer>
-        <?php 
+        <?php
         $this->renderView("default/blog-toc-next-prev-page", [
             "meta" => $meta,
-        ]); 
+        ]);
         ?>
     </footer>
 </section>
