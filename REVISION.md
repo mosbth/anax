@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.25 (2017-01-04)
+
+* Use `ANAX_APP_PATH` for session name.
+
+
 v2.5.24 (2016-11-28)
 
 * Add method `CRequest::hasGet()`.
