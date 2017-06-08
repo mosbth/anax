@@ -163,14 +163,28 @@ trait TFBCUtilities
      */
     private function addBaseurl2AnchorUrls(&$filtered, $baseurl)
     {
-        $textf  = $this->di->get("textFilter");
-        $url    = $this->di->get("url");
+        $textf   = $this->di->get("textFilter");
+        $url     = $this->di->get("url");
+        $request = $this->di->get("request");
+        $part = $request->getRoute();
 
         // Use callback to url->create() instead of string concat
-        $callback = function ($route) use ($url, $baseurl) {
+        $callback = function ($route) use ($url, $baseurl, $part) {
             if (!empty($route) && $route[0] == "!") {
                 return $url->asset(substr($route, 1), $baseurl);
             }
+
+            if (isset($route[0])
+                && isset($route[1])
+                && $route[0] === "."
+                && $route[1] === "/"
+            ) {
+                return $url->create(
+                    substr($route, 2),
+                    $baseurl . $part
+                );
+            }
+
             return $url->create($route, $baseurl);
         };
 

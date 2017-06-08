@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.26 (2017-06-08)
+
+* Enable markdown link to same page using ./.
+
+
 v2.5.25 (2017-01-04)
 
 * Use `ANAX_APP_PATH` for session name.
