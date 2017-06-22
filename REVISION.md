@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.27 (2017-06-22)
+
+* Fix warning in CFileBasedContent for PHP 7, need convert to integer.
+
+
 v2.5.26 (2017-06-08)
 
 * Enable markdown link to same page using ./.

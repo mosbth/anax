@@ -171,7 +171,7 @@ class CFileBasedContent
             
             // Create level depending on the file id
             // TODO ciamge doc, can be replaced by __toc__ in meta?
-            $id = $matches[1];
+            $id = (int) $matches[1];
             $level = 2;
             if ($id % 100 === 0) {
                 $level = 0;
