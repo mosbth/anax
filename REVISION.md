@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.28 (2017-10-18)
+
+* Fix: CFileBasedContent generate toc with duplicate items.
+
+
 v2.5.27 (2017-06-22)
 
 * Fix warning in CFileBasedContent for PHP 7, need convert to integer.

@@ -303,7 +303,7 @@ class CFileBasedContent
         $len = strlen($route);
 
         foreach ($this->index as $key => $value) {
-            if (substr($key, 0, $len) === $route) {
+            if (substr($key, 0, $len + 1) === "$route/") {
                 if ($value["internal"] === false
                     && $value["tocable"] === true) {
                     $toc[$key] = $value;
