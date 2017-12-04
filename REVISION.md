@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.29 (2017-12-04)
+
+* Fix: CUrl not to remove ending slash.
+
+
 v2.5.28 (2017-10-18)
 
 * Fix: CFileBasedContent generate toc with duplicate items.
