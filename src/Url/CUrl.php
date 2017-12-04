@@ -93,10 +93,8 @@ class CUrl
             return $this->siteUrl . $uri;
         } elseif ($uri[0] == "#"
             || $uri[0] == "?"
-            || $uri[0] == "!"
         ) {
-            // Hashtag url to local page, or query part, or ! special
-            // leave as is.
+            // Hashtag url to local page, or query part leave as is.
             return $uri;
         } elseif (substr($uri, 0, 7) == "mailto:"
             || substr(html_entity_decode($uri), 0, 7) == "mailto:") {
