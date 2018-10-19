@@ -11,7 +11,7 @@ $gravatarImage = "//www.gravatar.com/avatar/$gravatar?r=pg&amp;s=40&amp;d=wavata
         <span class="login">
             <a href="/forum/ucp.php?mode=login">
                 <span class="text">Login</span>
-                <i class="icon fa fa-sign-in"></i>
+                <i class="icon fas fa-sign-in-alt"></i>
             </a>
         </span>
 

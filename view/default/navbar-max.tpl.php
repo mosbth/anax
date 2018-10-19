@@ -5,8 +5,8 @@
     <div class="rm-small-wrapper">
         <ul class="rm-small">
             <li><a id="rm-menu-button" class="rm-button" href="#">
-                <i class="fa fa-bars rm-button-face-1"></i>
-                <i class="fa fa-times rm-button-face-2"></i>
+                <i class="fas fa-bars rm-button-face-1"></i>
+                <i class="fas fa-times rm-button-face-2"></i>
             </a></li>
         </ul>
     </div>
