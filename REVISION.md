@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.30 (2018-10-19)
+
+* Fix: Update login icon to Font Awesome 4.
+
+
 v2.5.29 (2017-12-04)
 
 * Fix: CUrl not to remove ending slash.
