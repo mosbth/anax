@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.31 (2024-02-20)
+
+* Fix: To mend XSS injection in error routes.
+
+
 v2.5.30 (2018-10-19)
 
 * Fix: Update login icon to Font Awesome 4.

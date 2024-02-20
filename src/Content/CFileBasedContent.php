@@ -564,8 +564,8 @@ class CFileBasedContent
             return [$routeIndex, $this->index[$routeIndex]];
         }
 
-        $msg = t("The route '!ROUTE' does not exists in the index.", [
-            "!ROUTE" => $route
+        $msg = t("The route @ROUTE does not exists in the index.", [
+            "@ROUTE" => $route
         ]);
         throw new \Anax\Exception\NotFoundException($msg);
     }
@@ -726,7 +726,7 @@ class CFileBasedContent
 
         // Load content from file
         if (!is_file($path)) {
-            $msg = t("The content '!ROUTE' does not exists as a file '!FILE'.", ["!ROUTE" => $key, "!FILE" => $path]);
+            $msg = t("The content '@ROUTE' does not exists as a file '!FILE'.", ["@ROUTE" => $key, "!FILE" => $path]);
             throw new \Anax\Exception\NotFoundException($msg);
         }
 
@@ -865,7 +865,7 @@ class CFileBasedContent
     {
         $content = $this->contentForInternalRoute($route);
         if ($content->internal === true) {
-            $msg = t("The content '!ROUTE' does not exists as a public route.", ["!ROUTE" => $route]);
+            $msg = t("The content '@ROUTE' does not exists as a public route.", ["@ROUTE" => $route]);
             throw new \Anax\Exception\NotFoundException($msg);
         }
 

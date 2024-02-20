@@ -20,7 +20,7 @@
 
 </head>
 
-<body <?= $this->classList($bodyClass, $currentRoute) ?>>
+<body <?= $this->classList($bodyClass, htmlentities($currentRoute)) ?>>
 
 <!-- wrapper around all items on page -->
 <div class="wrap-all">
