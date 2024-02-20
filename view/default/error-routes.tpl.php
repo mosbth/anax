@@ -1,4 +1,4 @@
-<p>You are using the following route:<br><code>'<?=esc($route)?>'</code></p>
+<p>You are using the following route:<br><code>'<?=htmlentities($route)?>'</code></p>
 
 <p>The router contains the following routes.</p>
 <ul>

@@ -6,6 +6,11 @@ Revision history
 History for Anax
 -----------------------------------
 
+v2.5.32 (2024-02-20)
+
+* Fix: Fix view to escape data.
+
+
 v2.5.31 (2024-02-20)
 
 * Fix: To mend XSS injection in error routes.
